@@ -1,13 +1,15 @@
 
 #include <Windows.h>
-#include "GL/glcorearb.h"
-#include "GL/glext.h"
+#include <memory>
+
+#include "scene.h"
 
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
 
 static HDC   hdc   = NULL;
 static HGLRC hglrc = NULL;
+static Scene* p_scene = NULL;
 
 void release_glrc() {
     if (hglrc != NULL) {
@@ -46,12 +48,15 @@ void init_glrc(HWND hwnd) {
     SetPixelFormat(hdc, iPixelFormat, &pfd);
     hglrc = wglCreateContext(hdc);
     wglMakeCurrent(hdc, hglrc);
+	gl_load_proc();
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+
     switch (message) {
     case WM_CREATE:
         init_glrc(hwnd);
+		p_scene = new HelloWorldScene();
         return 0;
 
     case WM_MOVE:
@@ -64,6 +69,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     case WM_PAINT:
         if (hglrc != NULL) {
+			GLuint query;
+			GLuint num;
+			glDisable(GL_DEPTH_TEST);
+			glGenQueries(1, &query);
+			glBeginQuery(GL_SAMPLES_PASSED, query);
+            p_scene->Draw();
+			glEndQuery(GL_SAMPLES_PASSED);
+			glGetQueryObjectuiv(query, GL_QUERY_RESULT, &num);
             SwapBuffers(hdc);
         }
 
@@ -74,6 +87,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     case WM_DESTROY:
         release_glrc();
+		delete p_scene;
         ReleaseDC(hwnd, hdc);
         PostQuitMessage(0);
         return 0;

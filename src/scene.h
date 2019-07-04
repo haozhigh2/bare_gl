@@ -3,7 +3,10 @@
 #include <string>
 using namespace std;
 
-#include "common.h"
+#include <Windows.h>
+#include <GL/GL.h>
+#include <gl/GLU.h>
+#include "gl_load_proc.h"
 #include "program.hpp"
 
 class Scene {
@@ -19,10 +22,14 @@ protected:
 class HelloWorldScene : public Scene {
 public:
 	HelloWorldScene();
-	~HelloWorldScene(){};
+	~HelloWorldScene();
 
 	void Draw();
 
 private:
+	void InitBuffers();
+
+private:
 	Program _program;
+	GLuint _buffer;
 };

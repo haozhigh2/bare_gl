@@ -5,13 +5,17 @@
 #include <vector>
 using namespace std;
 
-#include "common.h"
+#include <Windows.h>
+#include <GL/GL.h>
+#include <gl/GLU.h>
+#include "gl_load_proc.h"
+#include "program.hpp"
 
 class Program {
 public:
 	Program() : _program(NULL) { }
 
-	void LoadShaders(const map<GLuint, string>& shaders) {
+	void LoadShaders(const map<GLenum, string>& shaders) {
 		if (_program != NULL) {
 			glDeleteProgram(_program);
 			_program = NULL;

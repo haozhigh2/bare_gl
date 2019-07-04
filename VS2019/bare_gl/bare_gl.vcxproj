@@ -73,6 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\..\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -94,6 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,12 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\main.cpp" />
+    <ClInclude Include="..\..\src\GL\glcorearb.h" />
+    <ClInclude Include="..\..\src\GL\glext.h" />
+    <ClInclude Include="..\..\src\gl_load_proc.h" />
+    <ClInclude Include="..\..\src\KHR\khrplatform.h" />
+    <ClInclude Include="..\..\src\program.hpp" />
+    <ClInclude Include="..\..\src\scene.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\common.h" />
-    <ClInclude Include="..\..\src\program.hpp" />
-    <ClInclude Include="..\..\src\scene.hpp" />
+    <ClCompile Include="..\..\src\gl_load_proc.cc" />
+    <ClCompile Include="..\..\src\hello_world_scene.cc" />
+    <ClCompile Include="..\..\src\main.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
