@@ -19,6 +19,7 @@ glBeginQueryType glBeginQuery;
 glEndQueryType glEndQuery;
 glGetQueryObjectuivType glGetQueryObjectuiv;
 glVertexAttribPointerType glVertexAttribPointer;
+glEnableVertexAttribArrayType glEnableVertexAttribArray;
 glGetShaderivType glGetShaderiv;
 glGetShaderInfoLogType glGetShaderInfoLog;
 glGetProgramivType glGetProgramiv;
@@ -29,6 +30,9 @@ glBeginTransformFeedbackType glBeginTransformFeedback;
 glEndTransformFeedbackType glEndTransformFeedback;
 glBindBufferBaseType glBindBufferBase;
 glMapBufferType glMapBuffer;
+glGetShaderSourceType glGetShaderSource;
+glGetAttachedShadersType glGetAttachedShaders;
+glIsProgramType glIsProgram;
 
 void gl_load_proc() {
 	glCreateProgram = (glCreateProgramType)wglGetProcAddress("glCreateProgram");
@@ -49,6 +53,7 @@ void gl_load_proc() {
 	glEndQuery = (glEndQueryType)wglGetProcAddress("glEndQuery");
 	glGetQueryObjectuiv = (glGetQueryObjectuivType)wglGetProcAddress("glGetQueryObjectuiv");
 	glVertexAttribPointer = (glVertexAttribPointerType)wglGetProcAddress("glVertexAttribPointer");
+	glEnableVertexAttribArray = (glEnableVertexAttribArrayType)wglGetProcAddress("glEnableVertexAttribArray");
     glGetShaderiv = (glGetShaderivType)wglGetProcAddress("glGetShaderiv");
     glGetShaderInfoLog = (glGetShaderInfoLogType)wglGetProcAddress("glGetShaderInfoLog");
     glGetProgramiv = (glGetProgramivType)wglGetProcAddress("glGetProgramiv");
@@ -59,4 +64,7 @@ void gl_load_proc() {
     glEndTransformFeedback = (glEndTransformFeedbackType)wglGetProcAddress("glEndTransformFeedback");
     glBindBufferBase = (glBindBufferBaseType)wglGetProcAddress("glBindBufferBase");
     glMapBuffer = (glMapBufferType)wglGetProcAddress("glMapBuffer");
+	glGetShaderSource = (glGetShaderSourceType)wglGetProcAddress("glGetShaderSource");
+	glGetAttachedShaders = (glGetAttachedShadersType)wglGetProcAddress("glGetAttachedShaders");
+	glIsProgram = (glIsProgramType)wglGetProcAddress("glIsProgram");
 }

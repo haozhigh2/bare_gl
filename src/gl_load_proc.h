@@ -62,6 +62,9 @@ extern "C" {
 	typedef void (_stdcall *glVertexAttribPointerType)(GLuint, GLint, GLenum, GLboolean, GLsizei, const void *);
 	extern glVertexAttribPointerType glVertexAttribPointer;
 
+	typedef void (_stdcall *glEnableVertexAttribArrayType)(GLuint);
+	extern glEnableVertexAttribArrayType glEnableVertexAttribArray;
+
     typedef void (_stdcall *glGetShaderivType)(GLuint, GLenum, GLint *);
     extern glGetShaderivType glGetShaderiv;
 
@@ -91,4 +94,13 @@ extern "C" {
 
     typedef void* (_stdcall *glMapBufferType)(GLenum, GLenum);
     extern glMapBufferType glMapBuffer;
+
+	typedef void (_stdcall *glGetShaderSourceType)(GLuint, GLsizei, GLsizei *, GLchar *);
+	extern glGetShaderSourceType glGetShaderSource;
+
+	typedef void (_stdcall *glGetAttachedShadersType)(GLuint, GLsizei, GLsizei *, GLuint *);
+	extern glGetAttachedShadersType glGetAttachedShaders;
+
+	typedef GLboolean (_stdcall *glIsProgramType)(GLuint);
+	extern glIsProgramType glIsProgram;
 }

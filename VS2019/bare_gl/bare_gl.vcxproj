@@ -18,6 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\gl_load_proc.cc" />
+    <ClCompile Include="..\..\src\hello_world_scene.cc" />
+    <ClCompile Include="..\..\src\main.cc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{ADCB0EC3-F6AA-471D-9BB4-54A57F256CEF}</ProjectGuid>
@@ -145,19 +150,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\GL\glcorearb.h" />
-    <ClInclude Include="..\..\src\GL\glext.h" />
-    <ClInclude Include="..\..\src\gl_load_proc.h" />
-    <ClInclude Include="..\..\src\KHR\khrplatform.h" />
-    <ClInclude Include="..\..\src\program.hpp" />
-    <ClInclude Include="..\..\src\scene.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\gl_load_proc.cc" />
-    <ClCompile Include="..\..\src\hello_world_scene.cc" />
-    <ClCompile Include="..\..\src\main.cc" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

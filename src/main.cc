@@ -55,8 +55,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     switch (message) {
     case WM_CREATE:
-        init_glrc(hwnd);
-		p_scene = new HelloWorldScene();
+        //init_glrc(hwnd);
         return 0;
 
     case WM_MOVE:
@@ -65,6 +64,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     case WM_SIZE:
         init_glrc(hwnd);
+		p_scene = new HelloWorldScene();
         return 0;
 
     case WM_PAINT:
