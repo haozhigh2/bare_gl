@@ -14,14 +14,21 @@ glGenBuffersType glGenBuffers;
 glBindBufferType glBindBuffer;
 glBufferDataType glBufferData;
 glDeleteBuffersType glDeleteBuffers;
-//glDrawArraysType glDrawArrays;
 glGenQueriesType glGenQueries;
 glBeginQueryType glBeginQuery;
 glEndQueryType glEndQuery;
 glGetQueryObjectuivType glGetQueryObjectuiv;
-//glDisableType glDisable;
-//glEnableType glEnable;
 glVertexAttribPointerType glVertexAttribPointer;
+glGetShaderivType glGetShaderiv;
+glGetShaderInfoLogType glGetShaderInfoLog;
+glGetProgramivType glGetProgramiv;
+glGetProgramInfoLogType glGetProgramInfoLog;
+glTransformFeedbackVaryingsType glTransformFeedbackVaryings;
+glGetTransformFeedbackVaryingType glGetTransformFeedbackVarying;
+glBeginTransformFeedbackType glBeginTransformFeedback;
+glEndTransformFeedbackType glEndTransformFeedback;
+glBindBufferBaseType glBindBufferBase;
+glMapBufferType glMapBuffer;
 
 void gl_load_proc() {
 	glCreateProgram = (glCreateProgramType)wglGetProcAddress("glCreateProgram");
@@ -37,12 +44,19 @@ void gl_load_proc() {
 	glBindBuffer = (glBindBufferType)wglGetProcAddress("glBindBuffer");
 	glBufferData = (glBufferDataType)wglGetProcAddress("glBufferData");
 	glDeleteBuffers = (glDeleteBuffersType)wglGetProcAddress("glDeleteBuffers");
-	//glDrawArrays = (glDrawArraysType)wglGetProcAddress("glDrawArrays");
 	glGenQueries = (glGenQueriesType)wglGetProcAddress("glGenQueries");
 	glBeginQuery = (glBeginQueryType)wglGetProcAddress("glBeginQuery");
 	glEndQuery = (glEndQueryType)wglGetProcAddress("glEndQuery");
 	glGetQueryObjectuiv = (glGetQueryObjectuivType)wglGetProcAddress("glGetQueryObjectuiv");
-	//glDisable = (glDisableType)wglGetProcAddress("glDisable");
-	//glEnable = (glEnableType)wglGetProcAddress("glEnable");
 	glVertexAttribPointer = (glVertexAttribPointerType)wglGetProcAddress("glVertexAttribPointer");
+    glGetShaderiv = (glGetShaderivType)wglGetProcAddress("glGetShaderiv");
+    glGetShaderInfoLog = (glGetShaderInfoLogType)wglGetProcAddress("glGetShaderInfoLog");
+    glGetProgramiv = (glGetProgramivType)wglGetProcAddress("glGetProgramiv");
+    glGetProgramInfoLog = (glGetProgramInfoLogType)wglGetProcAddress("glGetProgramInfoLog");
+    glTransformFeedbackVaryings = (glTransformFeedbackVaryingsType)wglGetProcAddress("glTransformFeedbackVaryings");
+    glGetTransformFeedbackVarying = (glGetTransformFeedbackVaryingType)wglGetProcAddress("glGetTransformFeedbackVarying");
+    glBeginTransformFeedback = (glBeginTransformFeedbackType)wglGetProcAddress("glBeginTransformFeedback");
+    glEndTransformFeedback = (glEndTransformFeedbackType)wglGetProcAddress("glEndTransformFeedback");
+    glBindBufferBase = (glBindBufferBaseType)wglGetProcAddress("glBindBufferBase");
+    glMapBuffer = (glMapBufferType)wglGetProcAddress("glMapBuffer");
 }

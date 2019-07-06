@@ -62,9 +62,33 @@ extern "C" {
 	typedef void (_stdcall *glVertexAttribPointerType)(GLuint, GLint, GLenum, GLboolean, GLsizei, const void *);
 	extern glVertexAttribPointerType glVertexAttribPointer;
 
-	//typedef void (__stdcall *glDisableType)(GLenum);
-	//extern glDisableType glDisable;
+    typedef void (_stdcall *glGetShaderivType)(GLuint, GLenum, GLint *);
+    extern glGetShaderivType glGetShaderiv;
 
-	//typedef void (__stdcall *glEnableType)(GLenum);
-	//extern glEnableType glEnable;
+    typedef void (_stdcall *glGetShaderInfoLogType)(GLuint, GLsizei, GLsizei *, GLchar *);
+    extern glGetShaderInfoLogType glGetShaderInfoLog;
+
+    typedef void (_stdcall *glGetProgramivType)(GLuint, GLenum, GLint *);
+    extern glGetProgramivType glGetProgramiv;
+
+    typedef void (_stdcall *glGetProgramInfoLogType)(GLuint, GLsizei, GLsizei *, GLchar *);
+    extern glGetProgramInfoLogType glGetProgramInfoLog;
+
+    typedef void (_stdcall *glTransformFeedbackVaryingsType)(GLuint, GLsizei, const GLchar *const*, GLenum);
+    extern glTransformFeedbackVaryingsType glTransformFeedbackVaryings;
+
+    typedef void (_stdcall *glGetTransformFeedbackVaryingType)(GLuint, GLuint, GLsizei, GLsizei *, GLsizei *size, GLenum *, GLchar *);
+    extern glGetTransformFeedbackVaryingType glGetTransformFeedbackVarying;
+
+    typedef void (_stdcall *glBeginTransformFeedbackType)(GLenum);
+    extern glBeginTransformFeedbackType glBeginTransformFeedback;
+
+    typedef void (_stdcall *glEndTransformFeedbackType)(void);
+    extern glEndTransformFeedbackType glEndTransformFeedback;
+
+    typedef void (_stdcall *glBindBufferBaseType)(GLenum, GLuint, GLuint);
+    extern glBindBufferBaseType glBindBufferBase;
+
+    typedef void* (_stdcall *glMapBufferType)(GLenum, GLenum);
+    extern glMapBufferType glMapBuffer;
 }

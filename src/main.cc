@@ -31,14 +31,14 @@ void init_glrc(HWND hwnd) {
         PFD_TYPE_RGBA,         // RGBA type  
         24,                    // 24-bit color depth  
         0, 0, 0, 0, 0, 0,      // color bits ignored  
-        0,                     // no alpha buffer  
+        8,                     // no alpha buffer  
         0,                     // shift bit ignored  
         0,                     // no accumulation buffer  
         0, 0, 0, 0,            // accum bits ignored  
         32,                    // 32-bit z-buffer  
         0,                     // no stencil buffer  
         0,                     // no auxiliary buffer  
-        PFD_MAIN_PLANE,        // main layer  
+        0,                      // main layer  
         0,                     // reserved  
         0, 0, 0                // layer masks ignored  
     }; 
@@ -60,7 +60,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         return 0;
 
     case WM_MOVE:
-        init_glrc(hwnd);
+        //init_glrc(hwnd);
         return 0;
 
     case WM_SIZE:
@@ -69,14 +69,45 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     case WM_PAINT:
         if (hglrc != NULL) {
-			GLuint query;
-			GLuint num;
-			glDisable(GL_DEPTH_TEST);
-			glGenQueries(1, &query);
-			glBeginQuery(GL_SAMPLES_PASSED, query);
+
+            GLboolean bool_value;
+            GLboolean bool_values[4];
+            GLint int_value;
+            GLint int_values[4];
+            GLfloat float_value;
+            GLfloat float_values[4];
+
+            glGetIntegerv(GL_MAJOR_VERSION, &int_value);
+            glGetIntegerv(GL_MINOR_VERSION, &int_value);
+            glGetBooleanv(GL_BLEND, &bool_value);
+            glGetIntegerv(GL_COLOR_CLEAR_VALUE, int_values);
+            glGetBooleanv(GL_COLOR_LOGIC_OP, &bool_value);
+            glGetIntegerv(GL_LOGIC_OP_MODE, &int_value);
+            glGetBooleanv(GL_COLOR_WRITEMASK, bool_values);
+            glGetBooleanv(GL_CULL_FACE, &bool_value);
+            glGetIntegerv(GL_CULL_FACE_MODE, &int_value);
+            glGetIntegerv(GL_CURRENT_PROGRAM, &int_value);
+            glGetBooleanv(GL_DEPTH_TEST, &bool_value);
+            glGetBooleanv(GL_DEPTH_WRITEMASK, &bool_value);
+            glGetIntegerv(GL_DEPTH_CLEAR_VALUE, &int_value);
+            glGetBooleanv(GL_DOUBLEBUFFER, &bool_value);
+            glGetBooleanv(GL_DRAW_BUFFER, &bool_value);
+
+
+
+			GLuint query[2];
+			GLuint num[2];
+			glGenQueries(2, query);
+			glBeginQuery(GL_SAMPLES_PASSED, query[0]);
+			glBeginQuery(GL_PRIMITIVES_GENERATED, query[1]);
+
             p_scene->Draw();
+
 			glEndQuery(GL_SAMPLES_PASSED);
-			glGetQueryObjectuiv(query, GL_QUERY_RESULT, &num);
+			glEndQuery(GL_PRIMITIVES_GENERATED);
+			glGetQueryObjectuiv(query[0], GL_QUERY_RESULT, &num[0]);
+			glGetQueryObjectuiv(query[1], GL_QUERY_RESULT, &num[1]);
+
             SwapBuffers(hdc);
         }
 
