@@ -9,9 +9,9 @@
 
 static HDC   hdc   = NULL;
 static HGLRC hglrc = NULL;
-static Scene* p_scene = NULL;
+static unique_ptr<Scene> p_scene = NULL;
 
-void release_glrc() {
+void release_gl_context() {
     if (hglrc != NULL) {
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(hglrc);
@@ -19,8 +19,8 @@ void release_glrc() {
     }
 }
 
-void init_glrc(HWND hwnd) {
-    release_glrc();
+void init_gl_context(HWND hwnd) {
+    release_gl_context();
 
     PIXELFORMATDESCRIPTOR pfd = { 
         sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd  
@@ -48,35 +48,32 @@ void init_glrc(HWND hwnd) {
     SetPixelFormat(hdc, iPixelFormat, &pfd);
     hglrc = wglCreateContext(hdc);
     wglMakeCurrent(hdc, hglrc);
+
 	gl_load_proc();
+    p_scene = unique_ptr<Scene>(make_unique<SceneHelloWorld>());
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
     switch (message) {
     case WM_CREATE:
-        //init_glrc(hwnd);
         return 0;
 
     case WM_MOVE:
-        //init_glrc(hwnd);
         return 0;
 
     case WM_SIZE:
-        init_glrc(hwnd);
-		p_scene = new HelloWorldScene();
+        init_gl_context(hwnd);
         return 0;
 
     case WM_PAINT:
         if (hglrc != NULL) {
 
+#ifdef DEBUG_SHADER
             GLboolean bool_value;
             GLboolean bool_values[4];
             GLint int_value;
             GLint int_values[4];
-            GLfloat float_value;
-            GLfloat float_values[4];
-
             glGetIntegerv(GL_MAJOR_VERSION, &int_value);
             glGetIntegerv(GL_MINOR_VERSION, &int_value);
             glGetBooleanv(GL_BLEND, &bool_value);
@@ -93,20 +90,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             glGetBooleanv(GL_DOUBLEBUFFER, &bool_value);
             glGetBooleanv(GL_DRAW_BUFFER, &bool_value);
 
-
-
 			GLuint query[2];
 			GLuint num[2];
 			glGenQueries(2, query);
 			glBeginQuery(GL_SAMPLES_PASSED, query[0]);
 			glBeginQuery(GL_PRIMITIVES_GENERATED, query[1]);
+#endif
 
             p_scene->Draw();
 
+#ifdef DEBUG_SHADER
 			glEndQuery(GL_SAMPLES_PASSED);
 			glEndQuery(GL_PRIMITIVES_GENERATED);
 			glGetQueryObjectuiv(query[0], GL_QUERY_RESULT, &num[0]);
 			glGetQueryObjectuiv(query[1], GL_QUERY_RESULT, &num[1]);
+#endif
 
             SwapBuffers(hdc);
         }
@@ -117,8 +115,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         return 0;
 
     case WM_DESTROY:
-        release_glrc();
-		delete p_scene;
+        release_gl_context();
         ReleaseDC(hwnd, hdc);
         PostQuitMessage(0);
         return 0;

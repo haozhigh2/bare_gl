@@ -7,7 +7,7 @@ using namespace std;
 #include <GL/GL.h>
 #include <gl/GLU.h>
 #include "gl_load_proc.h"
-#include "program.hpp"
+#include "program.h"
 
 class Scene {
 public:
@@ -19,10 +19,10 @@ public:
 protected:
 };
 
-class HelloWorldScene : public Scene {
+class SceneHelloWorld : public Scene {
 public:
-	HelloWorldScene();
-	~HelloWorldScene();
+	SceneHelloWorld();
+	~SceneHelloWorld();
 
 	void Draw();
 

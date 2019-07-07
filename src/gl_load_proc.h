@@ -44,9 +44,6 @@ extern "C" {
 	typedef void (__stdcall *glDeleteBuffersType)(GLsizei, const GLuint*);
 	extern glDeleteBuffersType glDeleteBuffers;
 
-	//typedef void (__stdcall *glDrawArraysType)(GLenum, GLint, GLsizei);
-	//extern glDrawArraysType glDrawArrays;
-
 	typedef void (__stdcall *glGenQueriesType)(GLsizei, GLuint *);
 	extern glGenQueriesType glGenQueries;
 

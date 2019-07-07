@@ -9,7 +9,6 @@ using namespace std;
 #include <GL/GL.h>
 #include <gl/GLU.h>
 #include "gl_load_proc.h"
-#include "program.hpp"
 
 class Program {
 public:
@@ -30,6 +29,7 @@ public:
 			glShaderSource(shader_ids.back(), 1, &c_str, &length);
 			glCompileShader(shader_ids.back());
 
+#ifdef DEBUG_SHADER
             GLint status;
             glGetShaderiv(shader_ids.back(), GL_COMPILE_STATUS, &status);
             if (status != GL_TRUE) {
@@ -48,16 +48,19 @@ public:
 				glGetShaderSource(shader_ids.back(), status, NULL, c_str);
 				delete[] c_str;
 			}
+#endif
 
 			glAttachShader(_program, shader_ids.back());
 		}
 
-		//auto varying = string("gl_Position").c_str();
+#ifdef DEBUG_SHADER
         const char* varying = "gl_Position";
 		glTransformFeedbackVaryings(_program, 1, &varying, GL_INTERLEAVED_ATTRIBS);
+#endif
 
 		glLinkProgram(_program);
 
+#ifdef DEBUG_SHADER
         GLint status;
         glGetProgramiv(_program, GL_LINK_STATUS, &status);
         if (status != GL_TRUE) {
@@ -67,11 +70,9 @@ public:
             log.reserve(log_length);
             glGetProgramInfoLog(_program, log_length, NULL, &log[0]);
         }
-
 		GLuint attached_shaders[3];
 		glGetAttachedShaders(_program, 3, NULL, attached_shaders);
-
-			GLboolean is_program = glIsProgram(_program);
+		GLboolean is_program = glIsProgram(_program);
 		glGetProgramiv(_program, GL_DELETE_STATUS, &status);
 		glGetProgramiv(_program, GL_LINK_STATUS, &status);
 		glGetProgramiv(_program, GL_VALIDATE_STATUS, &status);
@@ -79,36 +80,39 @@ public:
 		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTES, &status);
 		glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &status);
 		glGetProgramiv(_program, GL_PROGRAM_BINARY_LENGTH, &status);
+#endif
 
-		//for (auto& it : shader_ids)
-		//	glDeleteShader(it);
+		for (auto& it : shader_ids)
+			glDeleteShader(it);
 	}
 
 	void Use() {
         if (_program != NULL) {
+#ifdef DEBUG_SHADER
             GLenum err;
             err = glGetError();
 
 			GLboolean is_program = glIsProgram(_program);
-        GLint status;
-		glGetProgramiv(_program, GL_DELETE_STATUS, &status);
-		glGetProgramiv(_program, GL_LINK_STATUS, &status);
-		glGetProgramiv(_program, GL_VALIDATE_STATUS, &status);
-		glGetProgramiv(_program, GL_ATTACHED_SHADERS, &status);
-		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTES, &status);
-		glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &status);
-		glGetProgramiv(_program, GL_PROGRAM_BINARY_LENGTH, &status);
+            GLint status;
+            glGetProgramiv(_program, GL_DELETE_STATUS, &status);
+            glGetProgramiv(_program, GL_LINK_STATUS, &status);
+            glGetProgramiv(_program, GL_VALIDATE_STATUS, &status);
+            glGetProgramiv(_program, GL_ATTACHED_SHADERS, &status);
+            glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTES, &status);
+            glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &status);
+            glGetProgramiv(_program, GL_PROGRAM_BINARY_LENGTH, &status);
 
 			GLint int_value;
 			glGetIntegerv(GL_CURRENT_PROGRAM, &int_value);
+#endif
 
 			glUseProgram(_program);
 
+#ifdef DEBUG_SHADER
 			GLint int_value2;
 			glGetIntegerv(GL_CURRENT_PROGRAM, &int_value2);
-
             err = glGetError();
-            err = glGetError();
+#endif
         }
 	}
 
