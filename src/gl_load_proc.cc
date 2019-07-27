@@ -33,6 +33,14 @@ glMapBufferType glMapBuffer;
 glGetShaderSourceType glGetShaderSource;
 glGetAttachedShadersType glGetAttachedShaders;
 glIsProgramType glIsProgram;
+glGetUniformLocationType glGetUniformLocation;
+glUniform1fType glUniform1f;
+glUniform2fType glUniform2f;
+glUniform3fType glUniform3f;
+glUniform4fType glUniform4f;
+glUniformMatrix2fvType glUniformMatrix2fv;
+glUniformMatrix3fvType glUniformMatrix3fv;
+glUniformMatrix4fvType glUniformMatrix4fv;
 
 void gl_load_proc() {
 	glCreateProgram = (glCreateProgramType)wglGetProcAddress("glCreateProgram");
@@ -67,4 +75,12 @@ void gl_load_proc() {
 	glGetShaderSource = (glGetShaderSourceType)wglGetProcAddress("glGetShaderSource");
 	glGetAttachedShaders = (glGetAttachedShadersType)wglGetProcAddress("glGetAttachedShaders");
 	glIsProgram = (glIsProgramType)wglGetProcAddress("glIsProgram");
+    glGetUniformLocation = (glGetUniformLocationType)wglGetProcAddress("glGetUniformLocation");
+    glUniform1f = (glUniform1fType)wglGetProcAddress("glUniform1f");
+    glUniform2f = (glUniform2fType)wglGetProcAddress("glUniform2f");
+    glUniform3f = (glUniform3fType)wglGetProcAddress("glUniform3f");
+    glUniform4f = (glUniform4fType)wglGetProcAddress("glUniform4f");
+    glUniformMatrix2fv = (glUniformMatrix2fvType)wglGetProcAddress("glUniformMatrix2fv");
+    glUniformMatrix3fv = (glUniformMatrix3fvType)wglGetProcAddress("glUniformMatrix3fv");
+    glUniformMatrix4fv = (glUniformMatrix4fvType)wglGetProcAddress("glUniformMatrix4fv");
 }

@@ -8,6 +8,8 @@ using namespace std;
 #include <gl/GLU.h>
 #include "gl_load_proc.h"
 #include "program.h"
+#include "uniform.h"
+#include "viewer.h"
 
 class Scene {
 public:
@@ -32,4 +34,21 @@ private:
 private:
 	Program _program;
 	GLuint _buffer;
+};
+
+class SceneBoard : public Scene {
+public:
+	SceneBoard();
+	~SceneBoard();
+
+	void Draw();
+
+private:
+	void InitBuffers();
+
+private:
+	Program _program;
+    vector<unique_ptr<UniformBase>> _uniforms;
+	GLuint _buffer;
+    Viewer _viewer;
 };
