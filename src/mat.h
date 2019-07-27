@@ -5,11 +5,11 @@
 #include <initializer_list>
 using namespace std;
 
-#define PI 3.141592653
+#define PI 3.141592653f
 
 template <typename T, unsigned N>
 struct Vec {
-	T data[N];
+    T data[N];
 
 	typedef Vec<T, N> TypeName;
 
@@ -35,6 +35,9 @@ struct Vec {
 
     inline const T& operator[](unsigned i) const {
         return data[i];
+    }
+    const T* Data() const {
+        return &data[0];
     }
 
 	inline void operator=(T x) {
@@ -200,6 +203,10 @@ struct Mat {
 	const auto& operator[](unsigned n) const{
 		return data[n];
 	}
+
+    const T* Data() const {
+        return &data[0][0];
+    }
 
     // operator= and copy constructors
     void operator=(const TypeName& rhs) {
@@ -395,11 +402,3 @@ typedef Mat<unsigned, 3> uimat3;
 typedef Mat<float, 4> mat4;
 typedef Mat<int, 4> imat4;
 typedef Mat<unsigned, 4> uimat4;
-
-vec4 homo(const vec4& v) {
-    if (v[3] == 0)
-        return v;
-    else {
-        return vec4{v[0] / v[3], v[1] / v[3], v[2] / v[3], 1.0f};
-    }
-}

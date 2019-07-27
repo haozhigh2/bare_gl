@@ -13,7 +13,7 @@ using namespace std;
 class UniformBase {
 public:
     UniformBase(const string& name) : _name(name) { }
-    virtual int Set() const = 0;
+    virtual void Set() const = 0;
     GLint GetUniformLocation() const {
         GLint program;
         glGetIntegerv(GL_CURRENT_PROGRAM, &program);
@@ -27,14 +27,14 @@ protected:
     string _name;
 };
 
-class Uniform4fv : public UniformBase {
+class UniformMatrix4fv : public UniformBase {
 public:
-    Uniform4fv(const string& name, const GLfloat* data): UniformBase(name) {
+    UniformMatrix4fv(const string& name, const GLfloat* data): UniformBase(name) {
         for (int i = 0; i < 16; i++)
             _data[i] = data[i];
     }
 
-    int Set() const {
+    void Set() const {
         GLint location = GetUniformLocation();
         if (location >= 0)
             glUniformMatrix4fv(location, 1, GL_TRUE, _data);
@@ -48,7 +48,7 @@ class Uniform1f : public UniformBase {
 public:
     Uniform1f(const string& name, GLfloat data): UniformBase(name), _data(data) { }
 
-    int Set() const {
+    void Set() const {
         GLint location = GetUniformLocation();
         if (location >= 0)
             glUniform1f(location, _data);
@@ -67,7 +67,7 @@ public:
         _data[3] = data3;
     }
 
-    int Set() const {
+    void Set() const {
         GLint location = GetUniformLocation();
         if (location >= 0)
             glUniform4f(location, _data[0], _data[1], _data[2], _data[3]);

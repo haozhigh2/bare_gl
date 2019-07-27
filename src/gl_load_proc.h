@@ -117,11 +117,11 @@ extern "C" {
     extern glUniform4fType glUniform4f;
 
     typedef void (_stdcall *glUniformMatrix2fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
-    glUniformMatrix2fvType glUniformMatrix2fv;
+    extern glUniformMatrix2fvType glUniformMatrix2fv;
 
     typedef void (_stdcall *glUniformMatrix3fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
-    glUniformMatrix3fvType glUniformMatrix3fv;
+    extern glUniformMatrix3fvType glUniformMatrix3fv;
 
     typedef void (_stdcall *glUniformMatrix4fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
-    glUniformMatrix4fvType glUniformMatrix4fv;
+    extern glUniformMatrix4fvType glUniformMatrix4fv;
 }

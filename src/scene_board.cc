@@ -26,14 +26,12 @@ SceneBoard::SceneBoard(): _buffer(0) {
     shaders[GL_FRAGMENT_SHADER] = fragment_shader_str;
     _program.LoadShaders(shaders);
 
-    _uniforms.push_back(make_unique<Uniform4f>(0.9f, 0.9f, 0.9f, 0.9f));
-
     _viewer.SetLoc(vec3{ 0.0f, 0.0f, 1.7f });
     _viewer.SetFrustum(PI / 2.0f, 1.6f);
+    _viewer.LookAt(vec3{ 0.0f, 1.0f, -0.8f });
 
-    mat4 world_mat(mat4::UnitMat());
-    mat4 view_mat;
-    mat4 project_mat;
+    _uniforms.push_back(make_unique<Uniform4f>(string("COLOR"), 0.9f, 0.9f, 0.9f, 0.9f));
+    _uniforms.push_back(make_unique<UniformMatrix4fv>(string("TRANSFORM_LOCAL2NDC"), _viewer.GetMatWorld2NDC().Data()));
 
 	InitBuffers();
 }
@@ -44,15 +42,42 @@ SceneBoard::~SceneBoard() {
 }
 
 void SceneBoard::InitBuffers() {
-    static GLfloat data[] {
-        -100.0f, 0.0f, 0.0f,
-         100.0f, 0.0f, 0.0f,
-         0.0f,  100.0f, 0.0f,
-         0.0f, -100.0f, 0.0f
-    };
+    vector<float> data;
+    data.reserve(2 * 3 * 201 * 2);
+
+    for (int i = 0; i <= 100; i++) {
+        data.push_back(-100.0f);
+        data.push_back(float(i));
+        data.push_back(0.0f);
+        data.push_back(100.0f);
+        data.push_back(float(i));
+        data.push_back(0.0f);
+
+        data.push_back(float(i));
+        data.push_back(-100.0f);
+        data.push_back(0.0f);
+        data.push_back(float(i));
+        data.push_back(100.0f);
+        data.push_back(0.0f);
+        if (i > 0) {
+            data.push_back(-100.0f);
+            data.push_back(-float(i));
+            data.push_back(0.0f);
+            data.push_back(100.0f);
+            data.push_back(-float(i));
+            data.push_back(0.0f);
+
+            data.push_back(-float(i));
+            data.push_back(-100.0f);
+            data.push_back(0.0f);
+            data.push_back(-float(i));
+            data.push_back(100.0f);
+            data.push_back(0.0f);
+        }
+    }
     glGenBuffers(1, &_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, _buffer);
-    glBufferData(GL_ARRAY_BUFFER, 3 * 4 * 4, data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * data.size(), &data[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -61,11 +86,12 @@ void SceneBoard::Draw() {
     _program.Use();
     for (const auto& uniform : _uniforms)
         uniform->Set();
-    glBindBuffer(GL_LINES, _buffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindBuffer(GL_ARRAY_BUFFER, _buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
+
+    glDrawArrays(GL_LINES, 0, 201 * 2 * 2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

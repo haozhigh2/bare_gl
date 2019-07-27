@@ -50,7 +50,7 @@ void init_gl_context(HWND hwnd) {
     wglMakeCurrent(hdc, hglrc);
 
 	gl_load_proc();
-    p_scene = unique_ptr<Scene>(make_unique<SceneHelloWorld>());
+    p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {

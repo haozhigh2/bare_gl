@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\gl_load_proc.cc" />
     <ClCompile Include="..\..\src\main.cc" />
+    <ClCompile Include="..\..\src\scene_board.cc" />
     <ClCompile Include="..\..\src\scene_hello_world.cc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
