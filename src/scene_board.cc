@@ -81,6 +81,9 @@ void SceneBoard::InitBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+string SceneBoard::Name() {
+    return "Board";
+}
 
 void SceneBoard::Draw() {
     glClear(GL_COLOR_BUFFER_BIT);

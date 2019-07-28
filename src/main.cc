@@ -1,4 +1,3 @@
-
 #include <Windows.h>
 #include <memory>
 
@@ -9,7 +8,10 @@
 
 static HDC   hdc   = NULL;
 static HGLRC hglrc = NULL;
-static unique_ptr<Scene> p_scene = NULL;
+static unique_ptr<Scene> p_scene{ nullptr };
+
+#define IDM_SCENE_HELLOWORLD 40001
+#define IDM_SCENE_BOARD      40002
 
 void release_gl_context() {
     if (hglrc != NULL) {
@@ -49,8 +51,27 @@ void init_gl_context(HWND hwnd) {
     hglrc = wglCreateContext(hdc);
     wglMakeCurrent(hdc, hglrc);
 
-	gl_load_proc();
-    p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
+    gl_load_proc();
+    if (p_scene == nullptr)
+        p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
+    else if (p_scene->Name() == "HelloWorld")
+        p_scene = unique_ptr<Scene>(make_unique<SceneHelloWorld>());
+    else if (p_scene->Name() == "Board")
+        p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
+}
+
+HMENU create_menu() {
+    HMENU h_menu_scenes_basic = CreateMenu();
+    AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_HELLOWORLD, "&HelloWorld");
+    AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_BOARD,      "&Board");
+
+    HMENU h_menu_scenes = CreateMenu();
+    AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_basic, "&Basic");
+
+    HMENU h_menu = CreateMenu();
+    AppendMenu(h_menu, MF_POPUP, (UINT_PTR)h_menu_scenes, "&Scenes");
+
+    return h_menu;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -66,11 +87,30 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         init_gl_context(hwnd);
         return 0;
 
-    case WM_KEYDOWN: {
+    case WM_KEYDOWN:
         p_scene->KeyDown(wParam);
         PostMessage(hwnd, WM_PAINT, 0, 0);
         return 0;
+
+    case WM_COMMAND: {
+        switch (LOWORD(wParam)) {
+        case IDM_SCENE_HELLOWORLD:
+            if (p_scene->Name() != "HelloWorld") {
+                p_scene = unique_ptr<Scene>(make_unique<SceneHelloWorld>());
+                PostMessage(hwnd, WM_PAINT, 0, 0);
+            }
+            return 0;
+        case IDM_SCENE_BOARD:
+            if (p_scene->Name() != "Board") {
+                p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
+                PostMessage(hwnd, WM_PAINT, 0, 0);
+            }
+            return 0;
+        default:
+            break;
+        }
     }
+        break;
 
     case WM_PAINT:
         if (hglrc != NULL) {
@@ -160,7 +200,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                         CW_USEDEFAULT,
                         CW_USEDEFAULT,
                         NULL,
-                        NULL,
+                        create_menu(),
                         hInstance,
                         NULL);
 

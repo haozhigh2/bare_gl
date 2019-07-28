@@ -18,6 +18,7 @@ public:
 	~Scene() {};
 
 	virtual void Draw() = 0;
+    virtual string Name() = 0;
     virtual void KeyDown(unsigned key) = 0;
 
 protected:
@@ -29,6 +30,7 @@ public:
 	~SceneHelloWorld();
 
 	void Draw();
+    string Name();
     void KeyDown(unsigned key) {};
 
 private:
@@ -45,6 +47,7 @@ public:
 	~SceneBoard();
 
 	void Draw();
+    string Name();
     void KeyDown(unsigned key);
 
 private:

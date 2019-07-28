@@ -9,7 +9,6 @@ using namespace std;
 #include <GL/GL.h>
 #include <gl/GLU.h>
 #include "gl_load_proc.h"
-#define DEBUG_SHADER
 
 class Program {
 public:

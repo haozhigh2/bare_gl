@@ -54,8 +54,13 @@ void SceneHelloWorld::InitBuffers() {
 #endif
 }
 
+string SceneHelloWorld::Name() {
+    return "HelloWorld";
+}
 
 void SceneHelloWorld::Draw() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
     _program.Use();
     glBindBuffer(GL_ARRAY_BUFFER, _buffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
