@@ -1,6 +1,5 @@
 #include "mat.h"
 #include "scene.h"
-#define DEBUG_SHADER
 
 static string vertex_shader_str = R"(
     #version 330 core
@@ -112,6 +111,18 @@ void SceneBoard::KeyDown(unsigned key) {
         break;
     case VK_RIGHT:
         _viewer.RotateRight();
+        break;
+    case 0x57:
+        _viewer.GoForward();
+        break;
+    case 0x53:
+        _viewer.GoBack();
+        break;
+    case 0x41:
+        _viewer.GoLeft();
+        break;
+    case 0x44:
+        _viewer.GoRight();
         break;
     default:
         break;

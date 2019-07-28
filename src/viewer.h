@@ -42,6 +42,7 @@ public:
             _phi -= PI * 2.0f;
         CalculateMatWorld2View();
     }
+
     void RotateRight() {
         _phi -= _step_angle;
         if (_phi < 0.0f)
@@ -49,6 +50,33 @@ public:
         CalculateMatWorld2View();
     }
 
+    void GoForward() {
+        vec3 forward_xy{ sin(_theta) * cos(_phi), sin(_theta) * sin(_phi), 0.0f };
+        forward_xy.Normalize();
+        _loc += forward_xy * _step_loc;
+        CalculateMatWorld2View();
+    }
+
+    void GoBack() {
+        vec3 forward_xy{ sin(_theta) * cos(_phi), sin(_theta) * sin(_phi), 0.0f };
+        forward_xy.Normalize();
+        _loc -= forward_xy * _step_loc;
+        CalculateMatWorld2View();
+    }
+
+    void GoLeft() {
+        vec3 forward_xy{ sin(_theta) * cos(_phi), sin(_theta) * sin(_phi), 0.0f };
+        forward_xy.Normalize();
+        _loc += vec3{ -forward_xy[1], forward_xy[0], 0.0f } * _step_loc;
+        CalculateMatWorld2View();
+    }
+
+    void GoRight() {
+        vec3 forward_xy{ sin(_theta) * cos(_phi), sin(_theta) * sin(_phi), 0.0f };
+        forward_xy.Normalize();
+        _loc += vec3{ forward_xy[1], -forward_xy[0], 0.0f } * _step_loc;
+        CalculateMatWorld2View();
+    }
 
     void SetFrustum(float alpha, float r) {
         _r = r;
@@ -114,4 +142,5 @@ private:
     mat4 _mat_world2ndc{ 0 };
 
     const float _step_angle{ PI / 32 };
+    const float _step_loc{ 0.1f };
 };
