@@ -82,9 +82,9 @@ private:
         mat3 P_inv{ P.Transpose() };
 
         vec3 eye_transformed{ P_inv * _loc };
-        _mat_world2view = mat4{ P_inv.data[0][0], P_inv.data[0][1], P_inv.data[0][2], -eye_transformed[0],
-                                P_inv.data[1][0], P_inv.data[1][1], P_inv.data[1][2], -eye_transformed[1],
-                                P_inv.data[2][0], P_inv.data[2][1], P_inv.data[2][2], -eye_transformed[2],
+        _mat_world2view = mat4{ P_inv[0][0], P_inv[0][1], P_inv[0][2], -eye_transformed[0],
+                                P_inv[1][0], P_inv[1][1], P_inv[1][2], -eye_transformed[1],
+                                P_inv[2][0], P_inv[2][1], P_inv[2][2], -eye_transformed[2],
                                 0,                0,                0,                1 };
         _mat_world2ndc = _mat_project * _mat_world2view;
     }
@@ -94,7 +94,7 @@ private:
             1 / (_r * tan(_alpha / 2)), 0, 0, 0,
             0,        1 / tan(_alpha / 2), 0, 0,
             0,                          0, 0, 1,
-            0,                          0, 1, 0
+            0,                          0, -1, 0
         };
         _mat_world2ndc = _mat_project * _mat_world2view;
     }

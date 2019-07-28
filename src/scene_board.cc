@@ -1,5 +1,6 @@
 #include "mat.h"
 #include "scene.h"
+#define DEBUG_SHADER
 
 static string vertex_shader_str = R"(
     #version 330 core
@@ -7,14 +8,14 @@ static string vertex_shader_str = R"(
     uniform mat4 TRANSFORM_LOCAL2NDC;
     
     void main(void) {
-        gl_Position = MAT_LOCAL_TO_NDC * vec4(pos, 1.0);
+        gl_Position = TRANSFORM_LOCAL2NDC * vec4(pos, 1.0);
     }
 )";
 
 static string fragment_shader_str = R"(
     #version 330 core
 	out vec4 color;
-    uinform float4 COLOR;
+    uniform vec4 COLOR;
     void main(void) {
         color = COLOR;
     }
@@ -28,7 +29,7 @@ SceneBoard::SceneBoard(): _buffer(0) {
 
     _viewer.SetLoc(vec3{ 0.0f, 0.0f, 1.7f });
     _viewer.SetFrustum(PI / 2.0f, 1.6f);
-    _viewer.LookAt(vec3{ 0.0f, 1.0f, -0.8f });
+    _viewer.LookAt(vec3{ 0.0f, 1.0f, 0.0f });
 
     _uniforms.push_back(make_unique<Uniform4f>(string("COLOR"), 0.9f, 0.9f, 0.9f, 0.9f));
     _uniforms.push_back(make_unique<UniformMatrix4fv>(string("TRANSFORM_LOCAL2NDC"), _viewer.GetMatWorld2NDC().Data()));
@@ -83,6 +84,8 @@ void SceneBoard::InitBuffers() {
 
 
 void SceneBoard::Draw() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
     _program.Use();
     for (const auto& uniform : _uniforms)
         uniform->Set();
@@ -94,4 +97,24 @@ void SceneBoard::Draw() {
     glDrawArrays(GL_LINES, 0, 201 * 2 * 2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void SceneBoard::KeyDown(unsigned key) {
+    switch (key) {
+    case VK_UP:
+        _viewer.RotateUp();
+        break;
+    case VK_DOWN:
+        _viewer.RotateDown();
+        break;
+    case VK_LEFT:
+        _viewer.RotateLeft();
+        break;
+    case VK_RIGHT:
+        _viewer.RotateRight();
+        break;
+    default:
+        break;
+    }
+    _uniforms[1] = make_unique<UniformMatrix4fv>(string("TRANSFORM_LOCAL2NDC"), _viewer.GetMatWorld2NDC().Data());
 }

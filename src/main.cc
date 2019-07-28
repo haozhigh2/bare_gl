@@ -66,6 +66,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         init_gl_context(hwnd);
         return 0;
 
+    case WM_KEYDOWN: {
+        p_scene->KeyDown(wParam);
+        PostMessage(hwnd, WM_PAINT, 0, 0);
+        return 0;
+    }
+
     case WM_PAINT:
         if (hglrc != NULL) {
 
