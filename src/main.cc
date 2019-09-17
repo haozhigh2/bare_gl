@@ -6,59 +6,8 @@
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
 
-static HDC   hdc   = NULL;
-static HGLRC hglrc = NULL;
-static unique_ptr<Scene> p_scene{ nullptr };
-
 #define IDM_SCENE_HELLOWORLD 40001
 #define IDM_SCENE_BOARD      40002
-
-void release_gl_context() {
-    if (hglrc != NULL) {
-        wglMakeCurrent(NULL, NULL);
-        wglDeleteContext(hglrc);
-        hglrc = NULL;
-    }
-}
-
-void init_gl_context(HWND hwnd) {
-    release_gl_context();
-
-    PIXELFORMATDESCRIPTOR pfd = { 
-        sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd  
-        1,                     // version number  
-        PFD_DRAW_TO_WINDOW |   // support window  
-        PFD_SUPPORT_OPENGL |   // support OpenGL  
-        PFD_DOUBLEBUFFER,      // double buffered  
-        PFD_TYPE_RGBA,         // RGBA type  
-        24,                    // 24-bit color depth  
-        0, 0, 0, 0, 0, 0,      // color bits ignored  
-        8,                     // no alpha buffer  
-        0,                     // shift bit ignored  
-        0,                     // no accumulation buffer  
-        0, 0, 0, 0,            // accum bits ignored  
-        32,                    // 32-bit z-buffer  
-        0,                     // no stencil buffer  
-        0,                     // no auxiliary buffer  
-        0,                      // main layer  
-        0,                     // reserved  
-        0, 0, 0                // layer masks ignored  
-    }; 
-
-    hdc = GetDC(hwnd);
-    int  iPixelFormat = ChoosePixelFormat(hdc, &pfd);
-    SetPixelFormat(hdc, iPixelFormat, &pfd);
-    hglrc = wglCreateContext(hdc);
-    wglMakeCurrent(hdc, hglrc);
-
-    gl_load_proc();
-    if (p_scene == nullptr)
-        p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
-    else if (p_scene->Name() == "HelloWorld")
-        p_scene = unique_ptr<Scene>(make_unique<SceneHelloWorld>());
-    else if (p_scene->Name() == "Board")
-        p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
-}
 
 HMENU create_menu() {
     HMENU h_menu_scenes_basic = CreateMenu();
@@ -75,17 +24,55 @@ HMENU create_menu() {
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    static unique_ptr<Scene> p_scene{ nullptr };
 
     switch (message) {
-    case WM_CREATE:
+    case WM_CREATE: {
+        PIXELFORMATDESCRIPTOR pfd ={
+            sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd  
+            1,                     // version number  
+            PFD_DRAW_TO_WINDOW |   // support window  
+            PFD_SUPPORT_OPENGL |   // support OpenGL  
+            PFD_DOUBLEBUFFER,      // double buffered  
+            PFD_TYPE_RGBA,         // RGBA type  
+            24,                    // 24-bit color depth  
+            0, 0, 0, 0, 0, 0,      // color bits ignored  
+            8,                     // no alpha buffer  
+            0,                     // shift bit ignored  
+            0,                     // no accumulation buffer  
+            0, 0, 0, 0,            // accum bits ignored  
+            32,                    // 32-bit z-buffer  
+            0,                     // no stencil buffer  
+            0,                     // no auxiliary buffer  
+            0,                      // main layer  
+            0,                     // reserved  
+            0, 0, 0                // layer masks ignored  
+        };
+
+        HDC hdc = GetDC(hwnd);
+        int  iPixelFormat = ChoosePixelFormat(hdc, &pfd);
+        SetPixelFormat(hdc, iPixelFormat, &pfd);
+        HGLRC hglrc = wglCreateContext(hdc);
+        wglMakeCurrent(hdc, hglrc);
+
+        gl_load_proc();
+
+        p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
         return 0;
+    }
 
     case WM_MOVE:
         return 0;
 
-    case WM_SIZE:
-        init_gl_context(hwnd);
+    case WM_ERASEBKGND:
         return 0;
+
+    case WM_SIZE: {
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+        p_scene->SetViewport(0, 0, rect.right, rect.bottom);
+        return 0;
+    }
 
     case WM_KEYDOWN:
         p_scene->KeyDown(wParam);
@@ -110,11 +97,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             break;
         }
     }
-        break;
+                     break;
 
     case WM_PAINT:
-        if (hglrc != NULL) {
-
 #ifdef DEBUG_SHADER
             GLboolean bool_value;
             GLboolean bool_values[4];
@@ -136,14 +121,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             glGetBooleanv(GL_DOUBLEBUFFER, &bool_value);
             glGetBooleanv(GL_DRAW_BUFFER, &bool_value);
 
-			GLuint query[2];
-			GLuint num[2];
-			glGenQueries(2, query);
-			glBeginQuery(GL_SAMPLES_PASSED, query[0]);
-			glBeginQuery(GL_PRIMITIVES_GENERATED, query[1]);
+            GLuint query[2];
+            GLuint num[2];
+            glGenQueries(2, query);
+            glBeginQuery(GL_SAMPLES_PASSED, query[0]);
+            glBeginQuery(GL_PRIMITIVES_GENERATED, query[1]);
 #endif
 
-            p_scene->Draw();
 
 #ifdef DEBUG_SHADER
 			glEndQuery(GL_SAMPLES_PASSED);
@@ -152,17 +136,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			glGetQueryObjectuiv(query[1], GL_QUERY_RESULT, &num[1]);
 #endif
 
-            SwapBuffers(hdc);
-        }
-
         PAINTSTRUCT ps;
         BeginPaint(hwnd, &ps);
+        p_scene->Draw();
+        SwapBuffers(GetDC(hwnd));
         EndPaint(hwnd, &ps);
         return 0;
 
     case WM_DESTROY:
-        release_gl_context();
-        ReleaseDC(hwnd, hdc);
         PostQuitMessage(0);
         return 0;
     }

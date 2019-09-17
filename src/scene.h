@@ -21,6 +21,8 @@ public:
     virtual string Name() = 0;
     virtual void KeyDown(unsigned key) = 0;
 
+    void SetViewport(GLint x, GLint y, GLsizei width, GLsizei height) { glViewport(x, y, width, height); }
+
 protected:
 };
 
