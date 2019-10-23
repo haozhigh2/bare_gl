@@ -4,124 +4,128 @@
 
 void gl_load_proc();
 
+#define GL_DECLARE_FUNCTION(FUNC) extern FUNC##Type FUNC
+#define GL_DEFINE_FUNCTION(FUNC) FUNC##Type FUNC
+#define GL_GET_FUNCTION_ADDRESS(FUNC) FUNC = (FUNC##Type)wglGetProcAddress(#FUNC)
+
 extern "C" {
 	typedef GLuint(__stdcall *glCreateProgramType)();
-	extern glCreateProgramType glCreateProgram;
+    GL_DECLARE_FUNCTION(glCreateProgram);
 
 	typedef void (__stdcall *glLinkProgramType)(GLuint);
-	extern glLinkProgramType glLinkProgram;
+	GL_DECLARE_FUNCTION(glLinkProgram);
 
 	typedef void (__stdcall *glUseProgramType)(GLuint);
-	extern glUseProgramType glUseProgram;
+	GL_DECLARE_FUNCTION(glUseProgram);
 
 	typedef void (__stdcall *glDeleteProgramType)(GLuint);
-	extern glDeleteProgramType glDeleteProgram;
+	GL_DECLARE_FUNCTION(glDeleteProgram);
 
 	typedef GLuint(__stdcall *glCreateShaderType)(GLenum);
-	extern glCreateShaderType glCreateShader;
+	GL_DECLARE_FUNCTION(glCreateShader);
 
 	typedef void (__stdcall *glShaderSourceType)(GLuint, GLsizei, const GLchar* const*, const GLint*);
-	extern glShaderSourceType glShaderSource;
+	GL_DECLARE_FUNCTION(glShaderSource);
 
 	typedef void (__stdcall *glCompileShaderType)(GLuint);
-	extern glCompileShaderType glCompileShader;
+	GL_DECLARE_FUNCTION(glCompileShader);
 
 	typedef void (__stdcall *glAttachShaderType)(GLuint, GLuint);
-	extern glAttachShaderType glAttachShader;
+	GL_DECLARE_FUNCTION(glAttachShader);
 
 	typedef void (__stdcall *glDeleteShaderType)(GLuint);
-	extern glDeleteShaderType glDeleteShader;
+	GL_DECLARE_FUNCTION(glDeleteShader);
 
 	typedef void (__stdcall *glGenBuffersType)(GLsizei, GLuint*);
-	extern glGenBuffersType glGenBuffers;
+	GL_DECLARE_FUNCTION(glGenBuffers);
 
 	typedef void (__stdcall *glBindBufferType)(GLenum, GLuint);
-	extern glBindBufferType glBindBuffer;
+	GL_DECLARE_FUNCTION(glBindBuffer);
 
 	typedef void (__stdcall *glBufferDataType)(GLenum, GLsizeiptr, const void*, GLenum);
-	extern glBufferDataType glBufferData;
+	GL_DECLARE_FUNCTION(glBufferData);
 
 	typedef void (__stdcall *glDeleteBuffersType)(GLsizei, const GLuint*);
-	extern glDeleteBuffersType glDeleteBuffers;
+	GL_DECLARE_FUNCTION(glDeleteBuffers);
 
 	typedef void (__stdcall *glGenQueriesType)(GLsizei, GLuint *);
-	extern glGenQueriesType glGenQueries;
+	GL_DECLARE_FUNCTION(glGenQueries);
 
 	typedef void (__stdcall *glBeginQueryType)(GLenum, GLuint);
-	extern glBeginQueryType glBeginQuery;
+	GL_DECLARE_FUNCTION(glBeginQuery);
 
 	typedef void (__stdcall *glEndQueryType)(GLenum);
-	extern glEndQueryType glEndQuery;
+	GL_DECLARE_FUNCTION(glEndQuery);
 
 	typedef void (__stdcall *glGetQueryObjectuivType)(GLuint, GLenum, GLuint *);
-	extern glGetQueryObjectuivType glGetQueryObjectuiv;
+	GL_DECLARE_FUNCTION(glGetQueryObjectuiv);
 
 	typedef void (_stdcall *glVertexAttribPointerType)(GLuint, GLint, GLenum, GLboolean, GLsizei, const void *);
-	extern glVertexAttribPointerType glVertexAttribPointer;
+	GL_DECLARE_FUNCTION(glVertexAttribPointer);
 
 	typedef void (_stdcall *glEnableVertexAttribArrayType)(GLuint);
-	extern glEnableVertexAttribArrayType glEnableVertexAttribArray;
+	GL_DECLARE_FUNCTION(glEnableVertexAttribArray);
 
     typedef void (_stdcall *glGetShaderivType)(GLuint, GLenum, GLint *);
-    extern glGetShaderivType glGetShaderiv;
+    GL_DECLARE_FUNCTION(glGetShaderiv);
 
     typedef void (_stdcall *glGetShaderInfoLogType)(GLuint, GLsizei, GLsizei *, GLchar *);
-    extern glGetShaderInfoLogType glGetShaderInfoLog;
+    GL_DECLARE_FUNCTION(glGetShaderInfoLog);
 
     typedef void (_stdcall *glGetProgramivType)(GLuint, GLenum, GLint *);
-    extern glGetProgramivType glGetProgramiv;
+    GL_DECLARE_FUNCTION(glGetProgramiv);
 
     typedef void (_stdcall *glGetProgramInfoLogType)(GLuint, GLsizei, GLsizei *, GLchar *);
-    extern glGetProgramInfoLogType glGetProgramInfoLog;
+    GL_DECLARE_FUNCTION(glGetProgramInfoLog);
 
     typedef void (_stdcall *glTransformFeedbackVaryingsType)(GLuint, GLsizei, const GLchar *const*, GLenum);
-    extern glTransformFeedbackVaryingsType glTransformFeedbackVaryings;
+    GL_DECLARE_FUNCTION(glTransformFeedbackVaryings);
 
     typedef void (_stdcall *glGetTransformFeedbackVaryingType)(GLuint, GLuint, GLsizei, GLsizei *, GLsizei *size, GLenum *, GLchar *);
-    extern glGetTransformFeedbackVaryingType glGetTransformFeedbackVarying;
+    GL_DECLARE_FUNCTION(glGetTransformFeedbackVarying);
 
     typedef void (_stdcall *glBeginTransformFeedbackType)(GLenum);
-    extern glBeginTransformFeedbackType glBeginTransformFeedback;
+    GL_DECLARE_FUNCTION(glBeginTransformFeedback);
 
     typedef void (_stdcall *glEndTransformFeedbackType)(void);
-    extern glEndTransformFeedbackType glEndTransformFeedback;
+    GL_DECLARE_FUNCTION(glEndTransformFeedback);
 
     typedef void (_stdcall *glBindBufferBaseType)(GLenum, GLuint, GLuint);
-    extern glBindBufferBaseType glBindBufferBase;
+    GL_DECLARE_FUNCTION(glBindBufferBase);
 
     typedef void* (_stdcall *glMapBufferType)(GLenum, GLenum);
-    extern glMapBufferType glMapBuffer;
+    GL_DECLARE_FUNCTION(glMapBuffer);
 
 	typedef void (_stdcall *glGetShaderSourceType)(GLuint, GLsizei, GLsizei *, GLchar *);
-	extern glGetShaderSourceType glGetShaderSource;
+	GL_DECLARE_FUNCTION(glGetShaderSource);
 
 	typedef void (_stdcall *glGetAttachedShadersType)(GLuint, GLsizei, GLsizei *, GLuint *);
-	extern glGetAttachedShadersType glGetAttachedShaders;
+	GL_DECLARE_FUNCTION(glGetAttachedShaders);
 
 	typedef GLboolean (_stdcall *glIsProgramType)(GLuint);
-	extern glIsProgramType glIsProgram;
+	GL_DECLARE_FUNCTION(glIsProgram);
 
     typedef GLint (_stdcall *glGetUniformLocationType)(GLuint, const GLchar *);
-    extern glGetUniformLocationType glGetUniformLocation;
+    GL_DECLARE_FUNCTION(glGetUniformLocation);
 
     typedef void (_stdcall *glUniform1fType)(GLint, GLfloat);
-    extern glUniform1fType glUniform1f;
+    GL_DECLARE_FUNCTION(glUniform1f);
 
     typedef void (_stdcall *glUniform2fType)(GLint, GLfloat, GLfloat);
-    extern glUniform2fType glUniform2f;
+    GL_DECLARE_FUNCTION(glUniform2f);
 
     typedef void (_stdcall *glUniform3fType)(GLint, GLfloat, GLfloat, GLfloat);
-    extern glUniform3fType glUniform3f;
+    GL_DECLARE_FUNCTION(glUniform3f);
 
     typedef void (_stdcall *glUniform4fType)(GLint, GLfloat, GLfloat, GLfloat, GLfloat);
-    extern glUniform4fType glUniform4f;
+    GL_DECLARE_FUNCTION(glUniform4f);
 
     typedef void (_stdcall *glUniformMatrix2fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
-    extern glUniformMatrix2fvType glUniformMatrix2fv;
+    GL_DECLARE_FUNCTION(glUniformMatrix2fv);
 
     typedef void (_stdcall *glUniformMatrix3fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
-    extern glUniformMatrix3fvType glUniformMatrix3fv;
+    GL_DECLARE_FUNCTION(glUniformMatrix3fv);
 
     typedef void (_stdcall *glUniformMatrix4fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
-    extern glUniformMatrix4fvType glUniformMatrix4fv;
+    GL_DECLARE_FUNCTION(glUniformMatrix4fv);
 }
