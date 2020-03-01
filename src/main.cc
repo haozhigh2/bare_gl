@@ -1,21 +1,23 @@
 #include <Windows.h>
 #include <memory>
 
-#include "scene.h"
-
-#pragma comment(lib,"opengl32.lib")
-#pragma comment(lib,"glu32.lib")
+#include "scene/scene.h"
 
 #define IDM_SCENE_HELLOWORLD 40001
 #define IDM_SCENE_BOARD      40002
+#define IDM_SCENE_RAY        40003
 
 HMENU create_menu() {
     HMENU h_menu_scenes_basic = CreateMenu();
     AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_HELLOWORLD, "&HelloWorld");
     AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_BOARD,      "&Board");
 
+    HMENU h_menu_scenes_ray = CreateMenu();
+    AppendMenu(h_menu_scenes_ray, MF_STRING, IDM_SCENE_RAY, "&Ray");
+
     HMENU h_menu_scenes = CreateMenu();
     AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_basic, "&Basic");
+    AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_ray, "&Ray Tracing");
 
     HMENU h_menu = CreateMenu();
     AppendMenu(h_menu, MF_POPUP, (UINT_PTR)h_menu_scenes, "&Scenes");
@@ -75,7 +77,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
     }
 
     case WM_KEYDOWN:
-        p_scene->KeyDown(wParam);
+        p_scene->KeyDown((int)wParam);
         PostMessage(hwnd, WM_PAINT, 0, 0);
         return 0;
 
@@ -93,11 +95,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 PostMessage(hwnd, WM_PAINT, 0, 0);
             }
             return 0;
+        case IDM_SCENE_RAY:
+            //if (p_scene->Name() != "Ray") {
+            //    p_scene = unique_ptr<Scene>(make_unique<SceneRay>());
+            //    PostMessage(hwnd, WM_PAINT, 0, 0);
+            //}
+            return 0;
         default:
             break;
         }
     }
-                     break;
 
     case WM_PAINT:
 #ifdef DEBUG_SHADER
@@ -192,5 +199,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    return msg.wParam;
+    return static_cast<int>(msg.wParam);
 }

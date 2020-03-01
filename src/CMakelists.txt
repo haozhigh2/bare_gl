@@ -1,0 +1,7 @@
+
+
+
+ADD_EXECUTABLE(bare_gl WIN32 main.cc gl_load_proc.cc)
+
+TARGET_LINK_LIBRARIES(bare_gl opengl32)
+TARGET_LINK_LIBRARIES(bare_gl glu32)
