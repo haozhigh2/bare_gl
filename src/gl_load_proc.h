@@ -128,4 +128,16 @@ extern "C" {
 
     typedef void (_stdcall *glUniformMatrix4fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
     GL_DECLARE_FUNCTION(glUniformMatrix4fv);
+
+    typedef void (_stdcall *glGenTexturesType)(GLsizei, GLuint *);
+    GL_DECLARE_FUNCTION(glGenTextures);
+
+    typedef void (_stdcall *glBindTextureType)(GLenum target, GLuint texture);
+    GL_DECLARE_FUNCTION(glBindTexture);
+
+    typedef void (_stdcall *glTexImage2DType)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void *);
+    GL_DECLARE_FUNCTION(glTexImage2D);
+
+    typedef void (_stdcall *glTexParameteriType)(GLenum, GLenum, GLint);
+    GL_DECLARE_FUNCTION(glTexParameteri);
 }

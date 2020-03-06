@@ -5,7 +5,6 @@
 #include <vector>
 using namespace std;
 
-#include <Windows.h>
 #include <GL/GL.h>
 #include <gl/GLU.h>
 #include "gl_load_proc.h"

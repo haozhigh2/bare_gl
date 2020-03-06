@@ -9,18 +9,18 @@
 
 HMENU create_menu() {
     HMENU h_menu_scenes_basic = CreateMenu();
-    AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_HELLOWORLD, "&HelloWorld");
-    AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_BOARD,      "&Board");
+    AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_HELLOWORLD, L"&HelloWorld");
+    AppendMenu(h_menu_scenes_basic, MF_STRING, IDM_SCENE_BOARD, L"&Board");
 
     HMENU h_menu_scenes_ray = CreateMenu();
-    AppendMenu(h_menu_scenes_ray, MF_STRING, IDM_SCENE_RAY, "&Ray");
+    AppendMenu(h_menu_scenes_ray, MF_STRING, IDM_SCENE_RAY, L"&Ray");
 
     HMENU h_menu_scenes = CreateMenu();
-    AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_basic, "&Basic");
-    AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_ray, "&Ray Tracing");
+    AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_basic, L"&Basic");
+    AppendMenu(h_menu_scenes, MF_POPUP, (UINT_PTR)h_menu_scenes_ray, L"&Ray Tracing");
 
     HMENU h_menu = CreateMenu();
-    AppendMenu(h_menu, MF_POPUP, (UINT_PTR)h_menu_scenes, "&Scenes");
+    AppendMenu(h_menu, MF_POPUP, (UINT_PTR)h_menu_scenes, L"&Scenes");
 
     return h_menu;
 }

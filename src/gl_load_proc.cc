@@ -41,6 +41,10 @@ GL_DEFINE_FUNCTION(glUniform4f);
 GL_DEFINE_FUNCTION(glUniformMatrix2fv);
 GL_DEFINE_FUNCTION(glUniformMatrix3fv);
 GL_DEFINE_FUNCTION(glUniformMatrix4fv);
+GL_DEFINE_FUNCTION(glGenTextures);
+GL_DEFINE_FUNCTION(glBindTexture);
+GL_DEFINE_FUNCTION(glTexImage2D);
+GL_DEFINE_FUNCTION(glTexParameteri);
 
 void gl_load_proc() {
     GL_GET_FUNCTION_ADDRESS(glCreateProgram);
@@ -83,4 +87,8 @@ void gl_load_proc() {
     GL_GET_FUNCTION_ADDRESS(glUniformMatrix2fv);
     GL_GET_FUNCTION_ADDRESS(glUniformMatrix3fv);
     GL_GET_FUNCTION_ADDRESS(glUniformMatrix4fv);
+    GL_GET_FUNCTION_ADDRESS(glGenTextures);
+    GL_GET_FUNCTION_ADDRESS(glBindTexture);
+    GL_GET_FUNCTION_ADDRESS(glTexImage2D);
+    GL_GET_FUNCTION_ADDRESS(glTexParameteri);
 }
