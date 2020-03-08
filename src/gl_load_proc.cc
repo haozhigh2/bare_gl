@@ -1,6 +1,7 @@
 
 #include "gl_load_proc.h"
 
+GL_DEFINE_FUNCTION(wglCreateContextAttribsARB);
 GL_DEFINE_FUNCTION(glCreateProgram);
 GL_DEFINE_FUNCTION(glLinkProgram);
 GL_DEFINE_FUNCTION(glUseProgram);
@@ -38,15 +39,23 @@ GL_DEFINE_FUNCTION(glUniform1f);
 GL_DEFINE_FUNCTION(glUniform2f);
 GL_DEFINE_FUNCTION(glUniform3f);
 GL_DEFINE_FUNCTION(glUniform4f);
+GL_DEFINE_FUNCTION(glUniform1fv);
+GL_DEFINE_FUNCTION(glUniform2fv);
+GL_DEFINE_FUNCTION(glUniform3fv);
+GL_DEFINE_FUNCTION(glUniform4fv);
 GL_DEFINE_FUNCTION(glUniformMatrix2fv);
 GL_DEFINE_FUNCTION(glUniformMatrix3fv);
 GL_DEFINE_FUNCTION(glUniformMatrix4fv);
-GL_DEFINE_FUNCTION(glGenTextures);
-GL_DEFINE_FUNCTION(glBindTexture);
-GL_DEFINE_FUNCTION(glTexImage2D);
-GL_DEFINE_FUNCTION(glTexParameteri);
+GL_DEFINE_FUNCTION(glGetStringi);
+GL_DEFINE_FUNCTION(glGetBufferSubData);
+GL_DEFINE_FUNCTION(glGetVertexAttribfv);
+GL_DEFINE_FUNCTION(glGetVertexAttribiv);
+GL_DEFINE_FUNCTION(glGenVertexArrays);
+GL_DEFINE_FUNCTION(glBindVertexArray);
+GL_DEFINE_FUNCTION(glDeleteVertexArrays);
 
 void gl_load_proc() {
+    GL_GET_FUNCTION_ADDRESS(wglCreateContextAttribsARB);
     GL_GET_FUNCTION_ADDRESS(glCreateProgram);
     GL_GET_FUNCTION_ADDRESS(glLinkProgram);
 	GL_GET_FUNCTION_ADDRESS(glUseProgram);
@@ -84,11 +93,18 @@ void gl_load_proc() {
     GL_GET_FUNCTION_ADDRESS(glUniform2f);
     GL_GET_FUNCTION_ADDRESS(glUniform3f);
     GL_GET_FUNCTION_ADDRESS(glUniform4f);
+    GL_GET_FUNCTION_ADDRESS(glUniform1fv);
+    GL_GET_FUNCTION_ADDRESS(glUniform2fv);
+    GL_GET_FUNCTION_ADDRESS(glUniform3fv);
+    GL_GET_FUNCTION_ADDRESS(glUniform4fv);
     GL_GET_FUNCTION_ADDRESS(glUniformMatrix2fv);
     GL_GET_FUNCTION_ADDRESS(glUniformMatrix3fv);
     GL_GET_FUNCTION_ADDRESS(glUniformMatrix4fv);
-    GL_GET_FUNCTION_ADDRESS(glGenTextures);
-    GL_GET_FUNCTION_ADDRESS(glBindTexture);
-    GL_GET_FUNCTION_ADDRESS(glTexImage2D);
-    GL_GET_FUNCTION_ADDRESS(glTexParameteri);
+    GL_GET_FUNCTION_ADDRESS(glGetStringi);
+    GL_GET_FUNCTION_ADDRESS(glGetBufferSubData);
+    GL_GET_FUNCTION_ADDRESS(glGetVertexAttribfv);
+    GL_GET_FUNCTION_ADDRESS(glGetVertexAttribiv);
+    GL_GET_FUNCTION_ADDRESS(glGenVertexArrays);
+    GL_GET_FUNCTION_ADDRESS(glBindVertexArray);
+    GL_GET_FUNCTION_ADDRESS(glDeleteVertexArrays);
 }

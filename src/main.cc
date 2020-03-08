@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <memory>
+#include <set>
 
 #include "scene/scene.h"
 
@@ -26,7 +27,7 @@ HMENU create_menu() {
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    static unique_ptr<Scene> p_scene{ nullptr };
+    static unique_ptr<SceneBase> p_scene{ nullptr };
 
     switch (message) {
     case WM_CREATE: {
@@ -54,12 +55,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         HDC hdc = GetDC(hwnd);
         int  iPixelFormat = ChoosePixelFormat(hdc, &pfd);
         SetPixelFormat(hdc, iPixelFormat, &pfd);
+
         HGLRC hglrc = wglCreateContext(hdc);
         wglMakeCurrent(hdc, hglrc);
-
         gl_load_proc();
 
-        p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
+        GLint context_flags[7]{
+             WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+             WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+             0
+             };
+        HGLRC hglrc2 = wglCreateContextAttribsARB(hdc, hglrc, context_flags);
+        wglMakeCurrent(hdc, hglrc2);
+        gl_load_proc();
+
+        //GLint num_extensions{0};
+        //set<string> extensions;
+        //glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+        //for (int i = 0; i < num_extensions; i++)
+        //    extensions.emplace((char*)glGetStringi(GL_EXTENSIONS, i));
+
+        p_scene = unique_ptr<SceneBase>(make_unique<SceneBoard>());
         return 0;
     }
 
@@ -85,13 +102,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         switch (LOWORD(wParam)) {
         case IDM_SCENE_HELLOWORLD:
             if (p_scene->Name() != "HelloWorld") {
-                p_scene = unique_ptr<Scene>(make_unique<SceneHelloWorld>());
+                p_scene = unique_ptr<SceneBase>(make_unique<SceneHelloWorld>());
                 PostMessage(hwnd, WM_PAINT, 0, 0);
             }
             return 0;
         case IDM_SCENE_BOARD:
             if (p_scene->Name() != "Board") {
-                p_scene = unique_ptr<Scene>(make_unique<SceneBoard>());
+                p_scene = unique_ptr<SceneBase>(make_unique<SceneBoard>());
                 PostMessage(hwnd, WM_PAINT, 0, 0);
             }
             return 0;
@@ -107,42 +124,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
     }
 
     case WM_PAINT:
-#ifdef DEBUG_SHADER
-            GLboolean bool_value;
-            GLboolean bool_values[4];
-            GLint int_value;
-            GLint int_values[4];
-            glGetIntegerv(GL_MAJOR_VERSION, &int_value);
-            glGetIntegerv(GL_MINOR_VERSION, &int_value);
-            glGetBooleanv(GL_BLEND, &bool_value);
-            glGetIntegerv(GL_COLOR_CLEAR_VALUE, int_values);
-            glGetBooleanv(GL_COLOR_LOGIC_OP, &bool_value);
-            glGetIntegerv(GL_LOGIC_OP_MODE, &int_value);
-            glGetBooleanv(GL_COLOR_WRITEMASK, bool_values);
-            glGetBooleanv(GL_CULL_FACE, &bool_value);
-            glGetIntegerv(GL_CULL_FACE_MODE, &int_value);
-            glGetIntegerv(GL_CURRENT_PROGRAM, &int_value);
-            glGetBooleanv(GL_DEPTH_TEST, &bool_value);
-            glGetBooleanv(GL_DEPTH_WRITEMASK, &bool_value);
-            glGetIntegerv(GL_DEPTH_CLEAR_VALUE, &int_value);
-            glGetBooleanv(GL_DOUBLEBUFFER, &bool_value);
-            glGetBooleanv(GL_DRAW_BUFFER, &bool_value);
-
-            GLuint query[2];
-            GLuint num[2];
-            glGenQueries(2, query);
-            glBeginQuery(GL_SAMPLES_PASSED, query[0]);
-            glBeginQuery(GL_PRIMITIVES_GENERATED, query[1]);
-#endif
-
-
-#ifdef DEBUG_SHADER
-			glEndQuery(GL_SAMPLES_PASSED);
-			glEndQuery(GL_PRIMITIVES_GENERATED);
-			glGetQueryObjectuiv(query[0], GL_QUERY_RESULT, &num[0]);
-			glGetQueryObjectuiv(query[1], GL_QUERY_RESULT, &num[1]);
-#endif
-
         PAINTSTRUCT ps;
         BeginPaint(hwnd, &ps);
         p_scene->Draw();

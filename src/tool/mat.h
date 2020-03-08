@@ -10,14 +10,12 @@ using namespace std;
 template <typename T, unsigned N>
 struct Vec
 {
-    T data[N];
-
     typedef Vec<T, N> TypeName;
 
     Vec<T, N>()
     {
         for (int i = 0; i < N; i++)
-            data[i] = 0;
+            _data[i] = 0;
     }
 
     Vec<T, N>(initializer_list<T> values)
@@ -26,77 +24,83 @@ struct Vec
             *this = *(values.begin());
         else
         {
-            const T *p{values.begin()};
+            auto it{values.begin()};
             for (int i = 0; i < N; i++)
-                data[i] = *p++;
+                _data[i] = *it++;
         }
     }
 
     Vec<T, N>(const TypeName &v)
     {
         for (int i = 0; i < N; i++)
-            data[i] = v.data[i];
+            _data[i] = v._data[i];
     }
 
-    T &operator[](unsigned i)
+    T& operator[](unsigned i)
     {
-        return data[i];
+        return _data[i];
     }
 
-    const T &operator[](unsigned i) const
+    const T& operator[](unsigned i) const
     {
-        return data[i];
+        return _data[i];
     }
+
+    T *Data()
+    {
+        return &_data[0];
+    }
+
     const T *Data() const
     {
-        return &data[0];
+        return &_data[0];
     }
 
     void operator=(T x)
     {
-        for (auto &it : data)
+        for (auto &it : _data)
             it = x;
     }
 
     void operator=(const TypeName &rhs)
     {
         for (int i = 0; i < N; i++)
-            data[i] = rhs.data[i];
+            _data[i] = rhs._data[i];
     }
 
     void operator+=(T x)
     {
-        for (auto &it : data)
+        for (auto &it : _data)
             it += x;
     }
 
     void operator+=(const TypeName &rhs)
     {
         for (int i = 0; i < N; i++)
-            data[i] += rhs.data[i];
+            _data[i] += rhs._data[i];
     }
 
     void operator-=(T x)
     {
-        for (auto &it : data)
+        for (auto &it : _data)
             it -= x;
     }
 
     void operator-=(const TypeName &rhs)
     {
         for (int i = 0; i < N; i++)
-            data[i] -= rhs.data[i];
+            _data[i] -= rhs._data[i];
     }
 
     void operator*=(T x)
     {
-        for (auto &it : data)
+        for (auto &it : _data)
             it *= x;
     }
 
     void operator/=(T x)
     {
-        for (auto &it : data)
+        for (auto &it : _data)
             it /= x;
     }
 
@@ -124,7 +128,7 @@ struct Vec
     TypeName operator-(const TypeName &rhs) const
     {
         TypeName result{*this};
-        result += rhs;
+        result -= rhs;
         return result;
     }
 
@@ -142,39 +146,26 @@ struct Vec
         return result;
     }
 
-    /*
-    ** dot product and cross product
-    */
     T Dot(const TypeName &rhs) const
     {
         T result{0};
         for (int i = 0; i < N; i++)
-            result += data[i] * rhs.data[i];
+            result += _data[i] * rhs._data[i];
         return result;
     }
 
     TypeName Cross(const TypeName &rhs) const
     {
-        if (N != 3)
-        {
-            cerr << "Cross product only supports vector of size 3" << endl;
-            exit(-1);
-        }
-        else
-        {
-            return Vec<T, 3>{data[1] * rhs.data[2] - data[2] * rhs.data[1],
-                             data[2] * rhs.data[0] - data[0] * rhs.data[2],
-                             data[0] * rhs.data[1] - data[1] * rhs.data[0]};
-        }
+        assert(N == 3);
+        return Vec<T, 3>{_data[1] * rhs._data[2] - _data[2] * rhs._data[1],
+                         _data[2] * rhs._data[0] - _data[0] * rhs._data[2],
+                         _data[0] * rhs._data[1] - _data[1] * rhs._data[0]};
     }
 
-    /*
-    ** length of vector in space
-    */
     T Len() const
     {
         T sum{0};
-        for (const auto &it : data)
+        for (const auto &it : _data)
             sum += it * it;
         return static_cast<T>(sqrt(static_cast<double>(sum)));
     }
@@ -183,6 +174,9 @@ struct Vec
     {
         this->operator/=(Len());
     }
+
+private:
+    T _data[N];
 };
 
 typedef Vec<float, 2> vec2;
@@ -197,69 +191,73 @@ typedef Vec<float, 4> vec4;
 typedef Vec<int, 4> ivec4;
 typedef Vec<unsigned, 4> uivec4;
 
-template <typename T, unsigned N>
+template <typename T, unsigned ROW, unsigned COL>
 struct Mat
 {
-    T data[N][N];
+    typedef Mat<T, ROW, COL> TypeName;
 
-    typedef Mat<T, N> TypeName;
-
-    Mat<T, N>(initializer_list<T> values)
+    Mat<T, ROW, COL>(initializer_list<T> values)
     {
         if (values.size() == 1)
-            (*this) = *(values.begin());
+            *this = *(values.begin());
         else
         {
-            const T *p{values.begin()};
-            for (unsigned r = 0; r < N; r++)
-                for (unsigned c = 0; c < N; c++)
-                    data[r][c] = *p++;
+            assert(values.size() == ROW * COL);
+            auto it{values.begin()};
+            for (unsigned i = 0; i < ROW * COL; i++)
+                _data[i] = *it++;
         }
     }
-    Mat<T, N>(initializer_list<Vec<T, N>> vecs)
+
+    Mat<T, ROW, COL>(initializer_list<Vec<T, ROW>> rows)
     {
-        const auto *p{vecs.begin()};
-        for (unsigned c = 0; c < N; c++)
+        assert(rows.size() == COL);
+        auto it{rows.begin()};
+        for (unsigned c = 0; c < COL; c++)
         {
-            for (unsigned r = 0; r < N; r++)
-                data[r][c] = (*p)[r];
-            p++;
+            for (unsigned r = 0; r < ROW; r++)
+                (*this)[r][c] = (*it)[r];
+            it++;
         }
     }
-    Mat<T, N>(const Mat<T, N> &rhs)
+    
+    Mat<T, ROW, COL>(const TypeName &rhs)
     {
-        for (unsigned r = 0; r < N; r++)
-            for (unsigned c = 0; c < N; c++)
-                data[r][c] = rhs.data[r][c];
+        *this = rhs;
     }
 
-    auto &operator[](unsigned n)
+    T* operator[](unsigned r)
     {
-        return data[n];
+        assert(r >= 0 && r < ROW);
+        return &_data[r * COL];
     }
 
-    const auto &operator[](unsigned n) const
+    const T* operator[](unsigned r) const
     {
-        return data[n];
+        assert(r >= 0 && r < ROW);
+        return &_data[r * COL];
+    }
+
+    T *Data()
+    {
+        return &_data[0];
     }
 
     const T *Data() const
     {
-        return &data[0][0];
+        return &_data[0];
     }
 
     void operator=(const TypeName &rhs)
     {
-        for (int r = 0; r < N; r++)
-            for (int c = 0; c < N; c++)
-                data[r][c] = rhs.data[r][c];
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] = rhs._data[i];
     }
 
     void operator=(const T x)
     {
-        for (auto &it_row : data)
-            for (auto &it : it_row)
-                it = x;
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] = x;
     }
 
     TypeName operator+(const TypeName &rhs) const
@@ -278,16 +276,14 @@ struct Mat
 
     void operator+=(const TypeName &rhs)
     {
-        for (int r = 0; r < N; r++)
-            for (int c = 0; c < N; c++)
-                data[r][c] += rhs.data[r][c];
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] += rhs._data[i];
     }
 
     void operator+=(T x)
     {
-        for (auto &it_row : data)
-            for (auto &it : it_row)
-                it += x;
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] += x;
     }
 
     TypeName operator-(const TypeName &rhs) const
@@ -306,25 +302,24 @@ struct Mat
 
     void operator-=(const TypeName &rhs)
     {
-        for (int r = 0; r < N; r++)
-            for (int c = 0; c < N; c++)
-                data[r][c] -= rhs.data[r][c];
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] -= rhs._data[i];
     }
 
     void operator-=(T x)
     {
-        for (auto &it_row : data)
-            for (auto &it : it_row)
-                it -= x;
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] -= x;
     }
 
-    TypeName operator*(const TypeName &rhs) const
+    template<unsigned COL2>
+    Mat<T, ROW, COL2> operator*(const Mat<T, COL, COL2> &rhs) const
     {
-        TypeName result{0};
-        for (int r = 0; r < N; r++)
-            for (int c = 0; c < N; c++)
-                for (int i = 0; i < N; i++)
-                    result[r][c] += data[r][i] * rhs[i][c];
+        Mat<T, ROW, COL2> result{0};
+        for (int r = 0; r < ROW; r++)
+            for (int c = 0; c < COL2; c++)
+                for (int i = 0; i < COL; i++)
+                    result[r][c] += (*this)[r][i] * rhs[i][c];
         return result;
     }
 
@@ -335,58 +330,54 @@ struct Mat
         return result;
     }
 
-    Vec<T, N> operator*(const Vec<T, N> &v) const
+    Vec<T, ROW> operator*(const Vec<T, COL> &v) const
     {
-        Vec<T, N> result{0};
-        for (int r = 0; r < N; r++)
-            for (int c = 0; c < N; c++)
-                result[r] += data[r][c] * v[c];
+        Vec<T, ROW> result{0};
+        for (int r = 0; r < ROW; r++)
+            for (int c = 0; c < COL; c++)
+                result[r] += (*this)[r][c] * v[c];
         return result;
-    }
-
-    void operator*=(const TypeName &rhs)
-    {
-        *this = (*this) * rhs;
     }
 
     void operator*=(T x)
     {
-        for (auto &it_row : data)
-            for (auto &it : it_row)
-                it *= x;
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] *= x;
     }
 
     void Replace(int r0, int r1, T x)
     {
-        for (int c = 0; c < N; c++)
-            data[r0][c] += data[r1][c] * x;
+        for (int c = 0; c < COL; c++)
+            (*this)[r0][c] += (*this)[r1][c] * x;
     }
 
     void Interchange(int r0, int r1)
     {
-        for (int c = 0; c < N; c++)
+        for (int c = 0; c < COL; c++)
         {
-            T tmp = data[r0][c];
-            data[r0][c] = data[r1][c];
-            data[r1][c] = tmp;
+            T tmp = (*this)[r0][c];
+            (*this)[r0][c] = (*this)[r1][c];
+            (*this)[r1][c] = tmp;
         }
     }
 
     void Scale(int r, T x)
     {
-        for (auto &it : data[r])
-            it *= x;
+        for (unsigned c = 0; c < COL; c++)
+            (*this)[r][c] *= x;
     }
 
     T Det() const
     {
+        assert(ROW == COL);
+        const unsigned N = ROW;
         T det{1};
         TypeName m{*this};
         for (int r = 0; r < N - 1; r++)
         {
             int r_max{r};
             for (int r_tmp = r + 1; r_tmp < N; r_tmp++)
-                if (m.data[r_tmp][r] > m.data[r_max][r])
+                if (m[r_tmp][r] > m[r_max][r])
                     r_max = r_tmp;
 
             if (r_max != r)
@@ -396,22 +387,24 @@ struct Mat
             }
 
             for (int r1 = r + 1; r1 < N; r1++)
-                m.Replace(r1, r, -m.data[r1][r] / m.data[r][r]);
+                m.Replace(r1, r, -m[r1][r] / m[r][r]);
         }
         for (int r = 0; r < N; r++)
-            det *= data[r][r];
+            det *= m[r][r];
         return det;
     }
 
     TypeName Inv() const
     {
+        assert(ROW == COL);
+        const unsigned N = ROW;
         TypeName m{*this};
         TypeName result{TypeName::UnitMat()};
         for (int r = 0; r < N - 1; r++)
         {
             int r_max{r};
             for (int r_tmp = r + 1; r_tmp < N; r_tmp++)
-                if (abs(m.data[r_tmp][r]) > abs(m.data[r_max][r]))
+                if (abs(m[r_tmp][r]) > abs(m[r_max][r]))
                     r_max = r_tmp;
 
             if (r_max != r)
@@ -422,7 +415,7 @@ struct Mat
 
             for (int r1 = r + 1; r1 < N; r1++)
             {
-                T tmp{-m.data[r1][r] / m.data[r][r]};
+                T tmp{-m[r1][r] / m[r][r]};
                 m.Replace(r1, r, tmp);
                 result.Replace(r1, r, tmp);
             }
@@ -430,51 +423,46 @@ struct Mat
         for (int r = N - 1; r > 0; r--)
             for (int r1 = r - 1; r1 >= 0; r1--)
             {
-                T tmp{-m.data[r1][r] / m.data[r][r]};
+                T tmp{-m[r1][r] / m[r][r]};
                 result.Replace(r1, r, tmp);
             }
         for (int r = 0; r < N; r++)
         {
-            result.Scale(r, 1 / m.data[r][r]);
+            result.Scale(r, 1 / m[r][r]);
         }
         return result;
     }
 
-    TypeName Transpose() const
+    Mat<T, COL, ROW> Transpose() const
     {
-        TypeName m{0};
-        for (int r = 0; r < N; r++)
-            for (int c = 0; c < N; c++)
+        Mat<T, COL, ROW> m{0};
+        for (int r = 0; r < COL; r++)
+            for (int c = 0; c < ROW; c++)
                 m[r][c] = (*this)[c][r];
         return m;
     }
 
-    static TypeName ConstMat(T x)
-    {
-        return TypeName{x};
-    }
-
-    static TypeName ZeroMat()
-    {
-        return TypeName{0};
-    }
-
     static TypeName UnitMat()
     {
+        assert(ROW == COL);
         TypeName result{0};
-        for (int r = 0; r < N; r++)
+        for (int r = 0; r < ROW; r++)
             result[r][r] = 1;
         return result;
     }
+
+private:
+    T _data[ROW * COL];
 };
-typedef Mat<float, 2> mat2;
-typedef Mat<int, 2> imat2;
-typedef Mat<unsigned, 2> uimat2;
 
-typedef Mat<float, 3> mat3;
-typedef Mat<int, 3> imat3;
-typedef Mat<unsigned, 3> uimat3;
+typedef Mat<float, 2, 2> mat2;
+typedef Mat<int, 2, 2> imat2;
+typedef Mat<unsigned, 2, 2> uimat2;
 
-typedef Mat<float, 4> mat4;
-typedef Mat<int, 4> imat4;
-typedef Mat<unsigned, 4> uimat4;
+typedef Mat<float, 3, 3> mat3;
+typedef Mat<int, 3, 3> imat3;
+typedef Mat<unsigned, 3, 3> uimat3;
+
+typedef Mat<float, 4, 4> mat4;
+typedef Mat<int, 4, 4> imat4;
+typedef Mat<unsigned, 4, 4> uimat4;

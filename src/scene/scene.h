@@ -4,11 +4,13 @@
 using namespace std;
 
 #include <Windows.h>
-#include <GL/GL.h>
-#include <gl/GLU.h>
+//#include <GL/GL.h>
+//#include <GL/GLU.h>
+#include "GL/glcorearb.h"
+#include "GL/glext.h"
+#include "GL/wglext.h"
 #include "gl_load_proc.h"
 #include "program/program.h"
-#include "program/uniform.h"
 #include "viewer/viewer.h"
 
 class SceneBase
@@ -29,7 +31,7 @@ protected:
 class SceneHelloWorld : public SceneBase
 {
 public:
-    SceneHelloWorld() : _buffer(0)
+    SceneHelloWorld() : _buffer(0), _vao(0)
     {
         const string vertex_shader_str = R"(
             #version 330 core
@@ -57,6 +59,8 @@ public:
     {
         if (_buffer != 0)
             glDeleteBuffers(1, &_buffer);
+        if (_vao != 0)
+            glDeleteVertexArrays(1, &_vao);
     }
 
     void Draw()
@@ -64,37 +68,20 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         _program.Use();
-        glBindBuffer(GL_ARRAY_BUFFER, _buffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
-
-#ifdef DEBUG_SHADER
-        glBeginTransformFeedback(GL_TRIANGLES);
-
-        GLint int_value;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &int_value);
-#endif
+        glBindVertexArray(_vao);
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
-
-#ifdef DEBUG_SHADER
-        glEndTransformFeedback();
-        void *data = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
-        float *data_float = (float *)data;
-#endif
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     string Name() { return "HelloWorld"; }
+
     void KeyDown(unsigned key) {}
 
 private:
     void InitBuffers()
     {
-#ifdef DEBUG_SHADER
-        GLuint tbuffer;
-#endif
+        glGenVertexArrays(1, &_vao);
+        glBindVertexArray(_vao);
 
         static GLfloat data[9]{
             0.0f, 1.0f, 0.5f,
@@ -102,42 +89,40 @@ private:
             1.0f, -1.0f, 0.5f};
         glGenBuffers(1, &_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, _buffer);
-        glBufferData(GL_ARRAY_BUFFER, 3 * 3 * 4, data, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), data, GL_STATIC_DRAW);
 
-#ifdef DEBUG_SHADER
-        glGenBuffers(1, &tbuffer);
-        glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, tbuffer);
-        glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, 1024, NULL, GL_DYNAMIC_COPY);
-        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbuffer);
-#endif
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     }
 
 private:
     Program _program;
     GLuint _buffer;
+    GLuint _vao;
 };
 
 class SceneBoard : public SceneBase
 {
 public:
-    SceneBoard()
+    SceneBoard(): _buffer(0), _vao(0)
     {
         _viewer.SetLoc(vec3{0.0f, 0.0f, 1.7f});
         _viewer.SetFrustum(PI / 2.0f, 1.6f);
         _viewer.LookAt(vec3{0.0f, 1.0f, 0.0f});
 
-        _uniforms.push_back(make_unique<Uniform4f>(string("COLOR"), 0.9f, 0.9f, 0.9f, 0.9f));
-        _uniforms.push_back(make_unique<UniformMatrix4fv>(string("TRANSFORM_LOCAL2NDC"), _viewer.GetMatWorld2NDC().Data()));
-
         InitProgram();
         InitBuffers();
+
+        _program.SetUniform4fv("COLOR", vec4({0.9f, 0.9f, 0.9f, 0.9f}));
+        _program.SetUniformMatrix4fv("TRANSFORM_LOCAL2NDC", _viewer.GetMatWorld2NDC());
     }
 
     ~SceneBoard()
     {
         if (_buffer != 0)
             glDeleteBuffers(1, &_buffer);
+        if (_vao != 0)
+            glDeleteVertexArrays(1, &_vao);
     }
 
     void Draw()
@@ -145,16 +130,9 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         _program.Use();
-        for (const auto &uniform : _uniforms)
-            uniform->Set();
-
-        glBindBuffer(GL_ARRAY_BUFFER, _buffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
+        glBindVertexArray(_vao);
 
         glDrawArrays(GL_LINES, 0, 201 * 2 * 2);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     string Name() { return "Board"; }
@@ -189,7 +167,7 @@ public:
         default:
             break;
         }
-        _uniforms[1] = make_unique<UniformMatrix4fv>(string("TRANSFORM_LOCAL2NDC"), _viewer.GetMatWorld2NDC().Data());
+        _program.SetUniformMatrix4fv("TRANSFORM_LOCAL2NDC", _viewer.GetMatWorld2NDC());
     }
 
 private:
@@ -222,6 +200,9 @@ private:
 
     void InitBuffers()
     {
+        glGenVertexArrays(1, &_vao);
+        glBindVertexArray(_vao);
+
         vector<float> data;
         data.reserve(2 * 3 * 201 * 2);
 
@@ -258,13 +239,15 @@ private:
         glGenBuffers(1, &_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, _buffer);
         glBufferData(GL_ARRAY_BUFFER, 4 * data.size(), &data[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray(0);
     }
 
 private:
     Program _program;
-    vector<unique_ptr<UniformBase>> _uniforms;
     GLuint _buffer;
+    GLuint _vao;
     Viewer _viewer;
 };
 
@@ -281,8 +264,6 @@ public:
         _viewer.SetFrustum(PI / 2.0f, 1.6f);
         _viewer.LookAt(vec3{0.0f, 1.0f, 0.0f});
 
-        _uniforms.push_back(make_unique<Uniform4f>(string("COLOR"), 0.9f, 0.9f, 0.9f, 0.9f));
-        _uniforms.push_back(make_unique<UniformMatrix4fv>(string("TRANSFORM_LOCAL2NDC"), _viewer.GetMatWorld2NDC().Data()));
     }
 
     ~SceneRay();
@@ -292,8 +273,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         _program.Use();
-        for (const auto &uniform : _uniforms)
-            uniform->Set();
 
         glBindBuffer(GL_ARRAY_BUFFER, _buffer);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), NULL);
@@ -385,7 +364,6 @@ private:
 
 private:
     Program _program;
-    vector<unique_ptr<UniformBase>> _uniforms;
     GLuint _buffer;
     GLuint _texture;
     Viewer _viewer;

@@ -120,6 +120,18 @@ extern "C" {
     typedef void (_stdcall *glUniform4fType)(GLint, GLfloat, GLfloat, GLfloat, GLfloat);
     GL_DECLARE_FUNCTION(glUniform4f);
 
+    typedef void(_stdcall *glUniform1fvType)(GLint, GLsizei, const GLfloat *);
+    GL_DECLARE_FUNCTION(glUniform1fv);
+
+    typedef void(_stdcall *glUniform2fvType)(GLint, GLsizei, const GLfloat *);
+    GL_DECLARE_FUNCTION(glUniform2fv);
+
+    typedef void(_stdcall *glUniform3fvType)(GLint, GLsizei, const GLfloat *);
+    GL_DECLARE_FUNCTION(glUniform3fv);
+
+    typedef void(_stdcall *glUniform4fvType)(GLint, GLsizei, const GLfloat *);
+    GL_DECLARE_FUNCTION(glUniform4fv);
+
     typedef void (_stdcall *glUniformMatrix2fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
     GL_DECLARE_FUNCTION(glUniformMatrix2fv);
 
@@ -129,15 +141,27 @@ extern "C" {
     typedef void (_stdcall *glUniformMatrix4fvType)(GLint, GLsizei, GLboolean, const GLfloat *);
     GL_DECLARE_FUNCTION(glUniformMatrix4fv);
 
-    typedef void (_stdcall *glGenTexturesType)(GLsizei, GLuint *);
-    GL_DECLARE_FUNCTION(glGenTextures);
+    typedef const GLubyte *(_stdcall *glGetStringiType)(GLenum, GLuint);
+    GL_DECLARE_FUNCTION(glGetStringi);
 
-    typedef void (_stdcall *glBindTextureType)(GLenum target, GLuint texture);
-    GL_DECLARE_FUNCTION(glBindTexture);
+    typedef HGLRC (_stdcall *wglCreateContextAttribsARBType)(HDC, HGLRC, const int *);
+    GL_DECLARE_FUNCTION(wglCreateContextAttribsARB);
 
-    typedef void (_stdcall *glTexImage2DType)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void *);
-    GL_DECLARE_FUNCTION(glTexImage2D);
+    typedef void (_stdcall *glGetBufferSubDataType)(GLenum, GLintptr, GLsizeiptr, void *);
+    GL_DECLARE_FUNCTION(glGetBufferSubData);
 
-    typedef void (_stdcall *glTexParameteriType)(GLenum, GLenum, GLint);
-    GL_DECLARE_FUNCTION(glTexParameteri);
+    typedef void (_stdcall *glGetVertexAttribfvType)(GLuint, GLenum, GLfloat *);
+    GL_DECLARE_FUNCTION(glGetVertexAttribfv);
+
+    typedef void (_stdcall *glGetVertexAttribivType)(GLuint, GLenum, GLint *);
+    GL_DECLARE_FUNCTION(glGetVertexAttribiv);
+
+    typedef void (_stdcall *glGenVertexArraysType)(GLsizei, GLuint *);
+    GL_DECLARE_FUNCTION(glGenVertexArrays);
+
+    typedef void (_stdcall *glBindVertexArrayType)(GLuint);
+    GL_DECLARE_FUNCTION(glBindVertexArray);
+
+    typedef void (_stdcall *glDeleteVertexArraysType)(GLsizei, const GLuint *);
+    GL_DECLARE_FUNCTION(glDeleteVertexArrays);
 }

@@ -3,11 +3,13 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <cassert>
 using namespace std;
 
 #include <GL/GL.h>
 #include <gl/GLU.h>
 #include "gl_load_proc.h"
+#include "tool/mat.h"
 
 class Program {
 public:
@@ -52,11 +54,6 @@ public:
 			glAttachShader(_program, shader_ids.back());
 		}
 
-#ifdef DEBUG_SHADER
-        const char* varying = "gl_Position";
-		glTransformFeedbackVaryings(_program, 1, &varying, GL_INTERLEAVED_ATTRIBS);
-#endif
-
 		glLinkProgram(_program);
 
 #ifdef DEBUG_SHADER
@@ -86,7 +83,7 @@ public:
 	}
 
 	void Use() {
-        if (_program != NULL) {
+        if (_program != 0) {
 #ifdef DEBUG_SHADER
             GLenum err;
             err = glGetError();
@@ -106,14 +103,32 @@ public:
 #endif
 
 			glUseProgram(_program);
-
-#ifdef DEBUG_SHADER
-			GLint int_value2;
-			glGetIntegerv(GL_CURRENT_PROGRAM, &int_value2);
-            err = glGetError();
-#endif
         }
 	}
+
+    void SetUniformMatrix4fv(const string& name, const mat4& data)
+    {
+        this->Use();
+        GLint location{glGetUniformLocation(_program, name.c_str())};
+        assert(location >= 0);
+        glUniformMatrix4fv(location, 1, GL_TRUE, data.Data());
+    }
+
+    void SetUniform4fv(const string& name, const vec4& data)
+    {
+        this->Use();
+        GLint location{glGetUniformLocation(_program, name.c_str())};
+        assert(location >= 0);
+        glUniform4fv(location, 1, data.Data());
+    }
+
+    void SetUniform1f(const string& name, float data)
+    {
+        this->Use();
+        GLint location{glGetUniformLocation(_program, name.c_str())};
+        assert(location >= 0);
+        glUniform1f(location, data);
+    }
 
 	~Program() {
 		glDeleteProgram(_program);
