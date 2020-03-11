@@ -130,6 +130,14 @@ public:
         glUniform1f(location, data);
     }
 
+    void SetUniform1i(const string& name, int data)
+    {
+        this->Use();
+        GLint location{glGetUniformLocation(_program, name.c_str())};
+        assert(location >= 0);
+        glUniform1i(location, data);
+    }
+
 	~Program() {
 		glDeleteProgram(_program);
 	}

@@ -12,6 +12,7 @@ GL_DEFINE_FUNCTION(glCompileShader);
 GL_DEFINE_FUNCTION(glAttachShader);
 GL_DEFINE_FUNCTION(glDeleteShader);
 GL_DEFINE_FUNCTION(glGenBuffers);
+GL_DEFINE_FUNCTION(glIsBuffer);
 GL_DEFINE_FUNCTION(glBindBuffer);
 GL_DEFINE_FUNCTION(glBufferData);
 GL_DEFINE_FUNCTION(glDeleteBuffers);
@@ -52,7 +53,17 @@ GL_DEFINE_FUNCTION(glGetVertexAttribfv);
 GL_DEFINE_FUNCTION(glGetVertexAttribiv);
 GL_DEFINE_FUNCTION(glGenVertexArrays);
 GL_DEFINE_FUNCTION(glBindVertexArray);
+GL_DEFINE_FUNCTION(glIsVertexArray);
 GL_DEFINE_FUNCTION(glDeleteVertexArrays);
+GL_DEFINE_FUNCTION(glUniform1iv);
+GL_DEFINE_FUNCTION(glUniform2iv);
+GL_DEFINE_FUNCTION(glUniform3iv);
+GL_DEFINE_FUNCTION(glUniform4iv);
+GL_DEFINE_FUNCTION(glUniform1i);
+GL_DEFINE_FUNCTION(glUniform2i);
+GL_DEFINE_FUNCTION(glUniform3i);
+GL_DEFINE_FUNCTION(glUniform4i);
+GL_DEFINE_FUNCTION(glActiveTexture);
 
 void gl_load_proc() {
     GL_GET_FUNCTION_ADDRESS(wglCreateContextAttribsARB);
@@ -66,6 +77,7 @@ void gl_load_proc() {
 	GL_GET_FUNCTION_ADDRESS(glAttachShader);
 	GL_GET_FUNCTION_ADDRESS(glDeleteShader);
 	GL_GET_FUNCTION_ADDRESS(glGenBuffers);
+    GL_GET_FUNCTION_ADDRESS(glIsBuffer);
 	GL_GET_FUNCTION_ADDRESS(glBindBuffer);
 	GL_GET_FUNCTION_ADDRESS(glBufferData);
 	GL_GET_FUNCTION_ADDRESS(glDeleteBuffers);
@@ -105,6 +117,16 @@ void gl_load_proc() {
     GL_GET_FUNCTION_ADDRESS(glGetVertexAttribfv);
     GL_GET_FUNCTION_ADDRESS(glGetVertexAttribiv);
     GL_GET_FUNCTION_ADDRESS(glGenVertexArrays);
+    GL_GET_FUNCTION_ADDRESS(glIsVertexArray);
     GL_GET_FUNCTION_ADDRESS(glBindVertexArray);
     GL_GET_FUNCTION_ADDRESS(glDeleteVertexArrays);
+    GL_GET_FUNCTION_ADDRESS(glUniform1iv);
+    GL_GET_FUNCTION_ADDRESS(glUniform2iv);
+    GL_GET_FUNCTION_ADDRESS(glUniform3iv);
+    GL_GET_FUNCTION_ADDRESS(glUniform4iv);
+    GL_GET_FUNCTION_ADDRESS(glUniform1i);
+    GL_GET_FUNCTION_ADDRESS(glUniform2i);
+    GL_GET_FUNCTION_ADDRESS(glUniform3i);
+    GL_GET_FUNCTION_ADDRESS(glUniform4i);
+    GL_GET_FUNCTION_ADDRESS(glActiveTexture);
 }

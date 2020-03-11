@@ -39,6 +39,9 @@ extern "C" {
 	typedef void (__stdcall *glGenBuffersType)(GLsizei, GLuint*);
 	GL_DECLARE_FUNCTION(glGenBuffers);
 
+    typedef GLboolean (_stdcall *glIsBufferType)(GLuint);
+    GL_DECLARE_FUNCTION(glIsBuffer);
+
 	typedef void (__stdcall *glBindBufferType)(GLenum, GLuint);
 	GL_DECLARE_FUNCTION(glBindBuffer);
 
@@ -159,9 +162,39 @@ extern "C" {
     typedef void (_stdcall *glGenVertexArraysType)(GLsizei, GLuint *);
     GL_DECLARE_FUNCTION(glGenVertexArrays);
 
+    typedef GLboolean (_stdcall *glIsVertexArrayType)(GLuint);
+    GL_DECLARE_FUNCTION(glIsVertexArray);
+
     typedef void (_stdcall *glBindVertexArrayType)(GLuint);
     GL_DECLARE_FUNCTION(glBindVertexArray);
 
     typedef void (_stdcall *glDeleteVertexArraysType)(GLsizei, const GLuint *);
     GL_DECLARE_FUNCTION(glDeleteVertexArrays);
+
+    typedef void (_stdcall *glUniform1ivType)(GLint, GLsizei, const GLint *);
+    GL_DECLARE_FUNCTION(glUniform1iv);
+
+    typedef void (_stdcall *glUniform2ivType)(GLint, GLsizei, const GLint *);
+    GL_DECLARE_FUNCTION(glUniform2iv);
+
+    typedef void (_stdcall *glUniform3ivType)(GLint, GLsizei, const GLint *);
+    GL_DECLARE_FUNCTION(glUniform3iv);
+
+    typedef void (_stdcall *glUniform4ivType)(GLint, GLsizei, const GLint *);
+    GL_DECLARE_FUNCTION(glUniform4iv);
+
+    typedef void (_stdcall *glUniform1iType)(GLint, GLint);
+    GL_DECLARE_FUNCTION(glUniform1i);
+
+    typedef void (_stdcall *glUniform2iType)(GLint, GLint, GLint);
+    GL_DECLARE_FUNCTION(glUniform2i);
+
+    typedef void (_stdcall *glUniform3iType)(GLint, GLint, GLint, GLint);
+    GL_DECLARE_FUNCTION(glUniform3i);
+
+    typedef void (_stdcall *glUniform4iType)(GLint, GLint, GLint, GLint, GLint);
+    GL_DECLARE_FUNCTION(glUniform4i);
+
+    typedef void (_stdcall *glActiveTextureType)(GLenum);
+    GL_DECLARE_FUNCTION(glActiveTexture);
 }

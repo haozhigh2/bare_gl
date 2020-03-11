@@ -113,10 +113,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             }
             return 0;
         case IDM_SCENE_RAY:
-            //if (p_scene->Name() != "Ray") {
-            //    p_scene = unique_ptr<Scene>(make_unique<SceneRay>());
-            //    PostMessage(hwnd, WM_PAINT, 0, 0);
-            //}
+            if (p_scene->Name() != "Ray") {
+                p_scene = unique_ptr<SceneBase>(make_unique<SceneRay>());
+
+                RECT rect;
+                GetClientRect(hwnd, &rect);
+                p_scene->SetViewport(0, 0, rect.right, rect.bottom);
+
+                PostMessage(hwnd, WM_PAINT, 0, 0);
+            }
             return 0;
         default:
             break;
