@@ -76,7 +76,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         //for (int i = 0; i < num_extensions; i++)
         //    extensions.emplace((char*)glGetStringi(GL_EXTENSIONS, i));
 
-        p_scene = unique_ptr<SceneBase>(make_unique<SceneBoard>());
+        p_scene = unique_ptr<SceneBase>(make_unique<SceneRay>());
         return 0;
     }
 

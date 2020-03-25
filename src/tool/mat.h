@@ -118,6 +118,14 @@ struct Vec
         return result;
     }
 
+    TypeName operator-() const
+    {
+        TypeName result{*this};
+        for (unsigned i = 0; i < N; i++)
+            result._data[i] = -result._data[i];
+        return result;
+    }
+
     TypeName operator-(T x) const
     {
         TypeName result{*this};
@@ -284,6 +292,14 @@ struct Mat
     {
         for (unsigned i = 0; i < ROW * COL; i++)
             _data[i] += x;
+    }
+
+    TypeName operator-() const
+    {
+        TypeName result{*this};
+        for (unsigned i = 0; i < ROW * COL; i++)
+            _data[i] = -_data[i];
+        return result;
     }
 
     TypeName operator-(const TypeName &rhs) const
@@ -466,3 +482,16 @@ typedef Mat<unsigned, 3, 3> uimat3;
 typedef Mat<float, 4, 4> mat4;
 typedef Mat<int, 4, 4> imat4;
 typedef Mat<unsigned, 4, 4> uimat4;
+
+class Ray
+{
+public:
+    Ray(const vec3 &origin, const vec3 &direction) : _origin(origin), _direction(direction) {}
+
+    const vec3 &Origin() const { return _origin; }
+    const vec3 &Direction() const { return _direction; }
+
+private:
+    vec3 _origin;
+    vec3 _direction;
+};

@@ -268,6 +268,9 @@ class SceneRay : public SceneBase
 public:
     SceneRay(): _buffer(0), _vao(0), _texture(0), _width(0), _height(0)
     {
+        _viewer.SetLoc(vec3{0.0f, 0.0f, 1.7f});
+        _viewer.LookAt(vec3{0.0f, 1.0f, 0.0f});
+
         InitProgram();
         InitBuffers();
 
@@ -308,6 +311,19 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
+    void Update()
+    {
+        for (int x = 0; x < _width; x++)
+            for (int y = 0; y < _height; y++)
+            {
+                Ray ray{_viewer.RayAtScreen(_width, _height, x, y)};
+                float t{0.5f * (ray.Direction()[2] + 1.0f)};
+                vec3 color{vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t};
+                SetColor(x, y, color);
+            }
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, _data.data());
+    }
+
     string Name() { return "Ray"; }
 
     void KeyDown(unsigned key) {}
@@ -315,7 +331,9 @@ public:
     void SetViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
         SceneBase::SetViewport(x, y, width, height);
+        _viewer.SetFrustum(PI / 2.0f, (float)width / height);
         this->InitTextures(width, height);
+        Update();
     }
 
 private:
@@ -400,23 +418,23 @@ private:
         _width = width;
         _height = height;
         _data.resize(width * height * 3);
-        for (int w = 0; w < width; w++)
-            for (int h = 0; h < height; h++)
-            {
-                if (h / 10 % 7 == 0)
-                {
-                _data[(h * width + w) * 3] = 1.0f;
-                _data[(h * width + w) * 3 + 1] = 0.0f;
-                _data[(h * width + w) * 3 + 2] = 0.0f;
-                }
-                else
-                {
-                _data[(h * width + w) * 3] = 0.0f;
-                _data[(h * width + w) * 3 + 1] = 0.0f;
-                _data[(h * width + w) * 3 + 2] = 0.0f;
-                }
-            }
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, _data.data());
+        //for (int w = 0; w < width; w++)
+        //    for (int h = 0; h < height; h++)
+        //    {
+        //        if (h / 10 % 7 == 0)
+        //            SetColor(w, h, {1.0f, 0.0f, 0.0f});
+        //        else
+        //            SetColor(w, h, {0.0f, 0.0f, 0.0f});
+        //    }
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, _data.data());
+    }
+
+    void SetColor(int x, int y, vec3 color)
+    {
+        assert(x >= 0 && x < _width && y >= 0 && y < _height);
+        _data[(y * _width + x) * 3] = color[0];
+        _data[(y * _width + x) * 3 + 1] = color[1];
+        _data[(y * _width + x) * 3 + 2] = color[2];
     }
 
 private:
@@ -428,4 +446,6 @@ private:
     int _width;
     int _height;
     vector<float> _data;
+
+    Viewer _viewer;
 };

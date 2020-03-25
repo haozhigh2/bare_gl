@@ -96,6 +96,30 @@ public:
         return _mat_world2ndc;
     }
 
+    Ray RayAtScreen(int screen_pixel_width, int screen_pixel_height, int screen_pixel_x, int screen_pixel_y)
+    {
+        /*
+        ** axis vector of view space in world space
+        */
+        vec3 z{-sin(_theta) * cos(_phi), -sin(_theta) * sin(_phi), -cos(_theta)};
+        vec3 x{vec3{0.0f, 0.0f, 1.0f}.Cross(z)};
+        vec3 y{z.Cross(x)};
+
+        x.Normalize();
+        y.Normalize();
+        z.Normalize();
+
+        float screen_half_height{1.0f};
+        float screen_half_width{_r};
+
+        vec3 direction{-z * (screen_half_height / tan(_alpha / 2.0f))};
+        direction += x * ((screen_pixel_x * 2 + 1 - screen_pixel_width) * screen_half_width / screen_pixel_width);
+        direction -= y * ((screen_pixel_y * 2 + 1 - screen_pixel_height) * screen_half_height / screen_pixel_height);
+        direction.Normalize();
+
+        return Ray(_loc, direction);
+    }
+
 private:
     void CalculateMatWorld2View() {
         vec3 z{ -sin(_theta) * cos(_phi), -sin(_theta) * sin(_phi), -cos(_theta) };
