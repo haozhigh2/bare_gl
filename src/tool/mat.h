@@ -172,10 +172,15 @@ struct Vec
 
     T Len() const
     {
+        return static_cast<T>(sqrt(static_cast<double>(Len2())));
+    }
+
+    T Len2() const
+    {
         T sum{0};
         for (const auto &it : _data)
             sum += it * it;
-        return static_cast<T>(sqrt(static_cast<double>(sum)));
+        return sum;
     }
 
     void Normalize()
@@ -482,16 +487,3 @@ typedef Mat<unsigned, 3, 3> uimat3;
 typedef Mat<float, 4, 4> mat4;
 typedef Mat<int, 4, 4> imat4;
 typedef Mat<unsigned, 4, 4> uimat4;
-
-class Ray
-{
-public:
-    Ray(const vec3 &origin, const vec3 &direction) : _origin(origin), _direction(direction) {}
-
-    const vec3 &Origin() const { return _origin; }
-    const vec3 &Direction() const { return _direction; }
-
-private:
-    vec3 _origin;
-    vec3 _direction;
-};

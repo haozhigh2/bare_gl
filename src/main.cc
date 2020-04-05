@@ -3,6 +3,7 @@
 #include <set>
 
 #include "scene/scene.h"
+#include "ray/SceneRay.h"
 
 #define IDM_SCENE_HELLOWORLD 40001
 #define IDM_SCENE_BOARD      40002
