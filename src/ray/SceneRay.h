@@ -3,23 +3,72 @@
 #include "tool/mat.h"
 #include "scene/scene.h"
 
+#include <limits>
+#ifdef max
+    #undef max
+#endif
+#ifdef min 
+    #undef min
+#endif
+
 class Ray
 {
 public:
-    Ray(const vec3 &origin, const vec3 &direction) : _origin(origin), _direction(direction)
-    {
-        _direction.Normalize();
-    }
+    Ray(const vec3 &origin, const vec3 &direction) : _origin(origin), _direction(direction.Normalize()) {}
 
     const vec3 &Origin() const { return _origin; }
     const vec3 &Direction() const { return _direction; }
+
+    vec3 At(float t) const { return _origin + _direction * t; }
 
 private:
     vec3 _origin;
     vec3 _direction;
 };
 
-class Sphere
+struct HitRecord
+{
+    float t;
+    vec3 point;
+    vec3 normal;
+};
+
+class Hittable
+{
+public:
+    virtual bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &record) const = 0;
+};
+
+class HittableList
+{
+public:
+    virtual void Add(unique_ptr<Hittable> hittable)
+    {
+        _list.push_back(std::move(hittable));
+    }
+
+    virtual bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &record) const
+    {
+        HitRecord tmp_record;
+        bool hit_anything{false};
+        float min_t{t_max};
+        for (const auto& p_hittable : _list)
+        {
+            if (p_hittable->Hit(ray, t_min, min_t, tmp_record))
+            {
+                hit_anything = true;
+                min_t = tmp_record.t;
+                record = tmp_record;
+            }
+        }
+        return hit_anything;
+    }
+
+private:
+    vector<unique_ptr<Hittable>> _list;
+};
+
+class Sphere : public Hittable
 {
 public:
     Sphere(const vec3 &origin, const float radius) : _origin(origin), _radius(radius) {}
@@ -27,35 +76,70 @@ public:
     const vec3 &Origin() const { return _origin; }
     float Radius() const { return _radius; }
 
+    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &record) const
+    {
+        vec3 v0{_origin - ray.Origin()};
+        if (v0.Len2() <= _radius * _radius)
+            return false;
+
+        float x{v0.Dot(ray.Direction())};
+        if (x <= 0)
+            return false;
+
+        vec3 v1{ray.Direction() * x};
+        if (v0.Len2() - v1.Len2() > _radius * _radius)
+            return false;
+
+        float t{x - sqrt(_radius * _radius - (v0.Len2() - v1.Len2()))};
+        if (t < t_min || t > t_max)
+            return false;
+
+        record.t = t;
+        record.point = ray.At(t);
+        record.normal = (record.point - _origin).Normalize();
+        return true;
+    }
+
 private:
     vec3 _origin;
     float _radius;
 };
 
-bool inside(const vec3& point, const Sphere& sphere)
+class ViewerRay : public ViewerBase
 {
-    vec3 v{sphere.Origin() - point};
-    return v.Len2() <= sphere.Radius() * sphere.Radius();
-}
+public:
+    ViewerRay(){}
+    ViewerRay(float alpha, float r) : ViewerBase(alpha, r) {}
 
-bool intersect(const Ray& ray, const Sphere& sphere)
-{
-    if(inside(ray.Origin(), sphere))
-        return false;
+    Ray RayAtScreen(int screen_pixel_width, int screen_pixel_height, int screen_pixel_x, int screen_pixel_y)
+    {
+        /*
+        ** axis vector of view space in world space
+        */
+        vec3 z{-sin(_theta) * cos(_phi), -sin(_theta) * sin(_phi), -cos(_theta)};
+        vec3 x{vec3{0.0f, 0.0f, 1.0f}.Cross(z)};
+        vec3 y{z.Cross(x)};
 
-    vec3 v0{sphere.Origin() - ray.Origin()};
-    float x{v0.Dot(ray.Direction())};
-    if (x <= 0)
-        return false;
+        x = x.Normalize();
+        y = y.Normalize();
+        z = z.Normalize();
 
-    vec3 v1{ray.Direction() * x};
-    return (v0.Len2() - v1.Len2() <= sphere.Radius() * sphere.Radius());
-}
+        float screen_half_height{1.0f};
+        float screen_half_width{_r};
+
+        vec3 direction{-z * (screen_half_height / tan(_alpha / 2.0f))};
+        direction += x * ((screen_pixel_x * 2 + 1 - screen_pixel_width) * screen_half_width / screen_pixel_width);
+        direction -= y * ((screen_pixel_y * 2 + 1 - screen_pixel_height) * screen_half_height / screen_pixel_height);
+        direction = direction.Normalize();
+
+        return Ray(_loc, direction);
+    }
+};
 
 class SceneRay : public SceneBase
 {
 public:
-    SceneRay(): _buffer(0), _vao(0), _texture(0), _width(0), _height(0)
+    SceneRay() : _buffer(0), _vao(0), _texture(0), _width(0), _height(0)
     {
         _viewer.SetLoc(vec3{0.0f, 0.0f, 1.7f});
         _viewer.LookAt(vec3{0.0f, 1.0f, 0.0f});
@@ -64,6 +148,9 @@ public:
         InitBuffers();
 
         _program.SetUniform1i("color_texture", 0);
+
+        _hittable_list.Add(make_unique<Sphere>(vec3({0.0f, 1.0f, 1.7f}), 0.5f));
+        _hittable_list.Add(make_unique<Sphere>(vec3({0.0f, 1.0f, 1.7f - 105.0f}), 100.0f));
     }
 
     ~SceneRay()
@@ -106,16 +193,56 @@ public:
             for (int y = 0; y < _height; y++)
             {
                 Ray ray{_viewer.RayAtScreen(_width, _height, x, y)};
-                float t{0.5f * (ray.Direction()[2] + 1.0f)};
-                vec3 color{vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t};
-                SetColor(x, y, color);
+                HitRecord record;
+                if (_hittable_list.Hit(ray, 0.0f, numeric_limits<float>::max(), record))
+                {
+                    SetColor(x, y, vec3({record.normal[0] + 1.0f, record.normal[2] + 1.0f, -record.normal[1] + 1.0f}) * 0.5f);
+                }
+                else
+                {
+                    float t{0.5f * (ray.Direction()[2] + 1.0f)};
+                    vec3 color{vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t};
+                    SetColor(x, y, color);
+                }
             }
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, _data.data());
     }
 
     string Name() { return "Ray"; }
 
-    void KeyDown(unsigned key) {}
+    void KeyDown(unsigned key)
+    {
+        switch (key)
+        {
+        case VK_UP:
+            _viewer.RotateUp();
+            break;
+        case VK_DOWN:
+            _viewer.RotateDown();
+            break;
+        case VK_LEFT:
+            _viewer.RotateLeft();
+            break;
+        case VK_RIGHT:
+            _viewer.RotateRight();
+            break;
+        case 0x57:
+            _viewer.GoForward();
+            break;
+        case 0x53:
+            _viewer.GoBack();
+            break;
+        case 0x41:
+            _viewer.GoLeft();
+            break;
+        case 0x44:
+            _viewer.GoRight();
+            break;
+        default:
+            break;
+        }
+        Update();
+    }
 
     void SetViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
@@ -236,5 +363,7 @@ private:
     int _height;
     vector<float> _data;
 
-    Viewer _viewer;
+    ViewerRay _viewer;
+
+    HittableList _hittable_list;
 };

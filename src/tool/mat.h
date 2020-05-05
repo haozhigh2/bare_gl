@@ -183,9 +183,11 @@ struct Vec
         return sum;
     }
 
-    void Normalize()
+    TypeName Normalize() const
     {
-        this->operator/=(Len());
+        TypeName result{*this};
+        result /= (result.Len());
+        return result;
     }
 
 private:

@@ -120,7 +120,11 @@ public:
         InitBuffers();
 
         _program.SetUniform4fv("COLOR", vec4({0.9f, 0.9f, 0.9f, 0.9f}));
-        _program.SetUniformMatrix4fv("TRANSFORM_LOCAL2NDC", _viewer.GetMatWorld2NDC());
+
+        mat4 world2view{0};
+        mat4 world2ndc{0};
+        _viewer.GetTransforms(world2view, world2ndc);
+        _program.SetUniformMatrix4fv("TRANSFORM_LOCAL2NDC", world2ndc);
     }
 
     ~SceneBoard()
@@ -179,7 +183,11 @@ public:
         default:
             break;
         }
-        _program.SetUniformMatrix4fv("TRANSFORM_LOCAL2NDC", _viewer.GetMatWorld2NDC());
+
+        mat4 world2view{0};
+        mat4 world2ndc{0};
+        _viewer.GetTransforms(world2view, world2ndc);
+        _program.SetUniformMatrix4fv("TRANSFORM_LOCAL2NDC", world2ndc);
     }
 
 private:
