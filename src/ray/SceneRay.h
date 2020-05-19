@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tool/mat.h"
+#include "tool/math.h"
 #include "scene/scene.h"
 
 #include <limits>
@@ -108,10 +109,10 @@ private:
 class ViewerRay : public ViewerBase
 {
 public:
-    ViewerRay(){}
-    ViewerRay(float alpha, float r) : ViewerBase(alpha, r) {}
+    ViewerRay() : _rand(-0.5f, 0.5f) {}
+    ViewerRay(float alpha, float r) : ViewerBase(alpha, r), _rand(-0.5f, 0.5f) {}
 
-    Ray RayAtScreen(int screen_pixel_width, int screen_pixel_height, int screen_pixel_x, int screen_pixel_y)
+    Ray RayAtScreen(int screen_pixel_width, int screen_pixel_height, int screen_pixel_x, int screen_pixel_y) const
     {
         /*
         ** axis vector of view space in world space
@@ -134,6 +135,38 @@ public:
 
         return Ray(_loc, direction);
     }
+
+    vector<Ray> RaysAtScreen(int screen_pixel_width, int screen_pixel_height, int screen_pixel_x, int screen_pixel_y, int num_samples)
+    {
+        /*
+        ** axis vector of view space in world space
+        */
+        vec3 z{-sin(_theta) * cos(_phi), -sin(_theta) * sin(_phi), -cos(_theta)};
+        vec3 x{vec3{0.0f, 0.0f, 1.0f}.Cross(z)};
+        vec3 y{z.Cross(x)};
+
+        x = x.Normalize();
+        y = y.Normalize();
+        z = z.Normalize();
+
+        float screen_half_height{1.0f};
+        float screen_half_width{_r};
+
+        vector<Ray> rays;
+        for (int s = 0; s < num_samples; s++)
+        {
+            vec3 direction{-z * (screen_half_height / tan(_alpha / 2.0f))};
+            direction += x * (((screen_pixel_x + _rand.Next()) * 2 + 1 - screen_pixel_width) * screen_half_width / screen_pixel_width);
+            direction -= y * (((screen_pixel_y + _rand.Next()) * 2 + 1 - screen_pixel_height) * screen_half_height / screen_pixel_height);
+            direction = direction.Normalize();
+            rays.emplace_back(_loc, direction);
+        }
+
+        return rays;
+    }
+
+    private:
+        RandomReal _rand;
 };
 
 class SceneRay : public SceneBase
@@ -189,20 +222,24 @@ public:
 
     void Update()
     {
+        const int num_samples{16};
         for (int x = 0; x < _width; x++)
             for (int y = 0; y < _height; y++)
             {
-                Ray ray{_viewer.RayAtScreen(_width, _height, x, y)};
-                HitRecord record;
-                if (_hittable_list.Hit(ray, 0.0f, numeric_limits<float>::max(), record))
+                vec3 color{0};
+                for (const auto& ray : _viewer.RaysAtScreen(_width, _height, x, y, num_samples))
                 {
-                    SetColor(x, y, vec3({record.normal[0] + 1.0f, record.normal[2] + 1.0f, -record.normal[1] + 1.0f}) * 0.5f);
-                }
-                else
-                {
-                    float t{0.5f * (ray.Direction()[2] + 1.0f)};
-                    vec3 color{vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t};
-                    SetColor(x, y, color);
+                    HitRecord record;
+                    if (_hittable_list.Hit(ray, 0.0f, numeric_limits<float>::max(), record))
+                    {
+                        color += vec3({record.normal[0] + 1.0f, record.normal[2] + 1.0f, -record.normal[1] + 1.0f}) * 0.5f;
+                    }
+                    else
+                    {
+                        float t{0.5f * (ray.Direction()[2] + 1.0f)};
+                        color += vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t;
+                    }
+                    SetColor(x, y, color / num_samples);
                 }
             }
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, _data.data());
