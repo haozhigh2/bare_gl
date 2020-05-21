@@ -183,7 +183,7 @@ public:
         _program.SetUniform1i("color_texture", 0);
 
         _hittable_list.Add(make_unique<Sphere>(vec3({0.0f, 1.0f, 1.7f}), 0.5f));
-        _hittable_list.Add(make_unique<Sphere>(vec3({0.0f, 1.0f, 1.7f - 105.0f}), 100.0f));
+        _hittable_list.Add(make_unique<Sphere>(vec3({0.0f, 1.0f, 1.7f - 100.5f}), 100.0f));
     }
 
     ~SceneRay()
@@ -222,25 +222,14 @@ public:
 
     void Update()
     {
-        const int num_samples{16};
+        const int num_samples{8};
         for (int x = 0; x < _width; x++)
             for (int y = 0; y < _height; y++)
             {
                 vec3 color{0};
-                for (const auto& ray : _viewer.RaysAtScreen(_width, _height, x, y, num_samples))
-                {
-                    HitRecord record;
-                    if (_hittable_list.Hit(ray, 0.0f, numeric_limits<float>::max(), record))
-                    {
-                        color += vec3({record.normal[0] + 1.0f, record.normal[2] + 1.0f, -record.normal[1] + 1.0f}) * 0.5f;
-                    }
-                    else
-                    {
-                        float t{0.5f * (ray.Direction()[2] + 1.0f)};
-                        color += vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t;
-                    }
-                    SetColor(x, y, color / num_samples);
-                }
+                for (const auto &ray : _viewer.RaysAtScreen(_width, _height, x, y, num_samples))
+                    color += GetColor(ray);
+                SetColor(x, y, color / num_samples);
             }
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, _data.data());
     }
@@ -371,15 +360,6 @@ private:
         _width = width;
         _height = height;
         _data.resize(width * height * 3);
-        //for (int w = 0; w < width; w++)
-        //    for (int h = 0; h < height; h++)
-        //    {
-        //        if (h / 10 % 7 == 0)
-        //            SetColor(w, h, {1.0f, 0.0f, 0.0f});
-        //        else
-        //            SetColor(w, h, {0.0f, 0.0f, 0.0f});
-        //    }
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, _data.data());
     }
 
     void SetColor(int x, int y, vec3 color)
@@ -389,6 +369,20 @@ private:
         _data[(y * _width + x) * 3 + 1] = color[1];
         _data[(y * _width + x) * 3 + 2] = color[2];
     }
+
+    vec3 GetColor(const Ray &ray)
+    {
+        HitRecord record;
+        if (_hittable_list.Hit(ray, 0.0f, numeric_limits<float>::max(), record))
+        {
+            return GetColor(Ray(record.point, record.normal + _randVec.Next())) * 0.5f;
+        }
+        else
+        {
+            float t{0.5f * (ray.Direction()[2] + 1.0f)};
+            return vec3({1.0f, 1.0f, 1.0f}) * (1.0f - t) + vec3({0.5f, 0.7f, 1.0f}) * t;
+        }
+    };
 
 private:
     Program _program;
@@ -401,6 +395,7 @@ private:
     vector<float> _data;
 
     ViewerRay _viewer;
+    RandomUnitVector _randVec;
 
     HittableList _hittable_list;
 };
